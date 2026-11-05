@@ -24,9 +24,12 @@ class UserModelManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     mobile      = models.CharField(max_length=20, unique=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     is_active   = models.BooleanField(default=True)
     is_staff    = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+
 
     objects = UserModelManager()
 

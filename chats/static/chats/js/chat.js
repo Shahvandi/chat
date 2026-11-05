@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const chatApp = document.getElementById("chatApp");
+    // ==============================
+    // DOM Elements
+    // ==============================
 
+    const chatApp = document.getElementById("chatApp");
     const chatItems = document.querySelectorAll(".chat-item");
 
     const headerName = document.getElementById("headerName");
@@ -16,8 +19,95 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const chatSearch = document.getElementById("chatSearch");
 
+    // Conversation ID
+    let conversationId =
+        chatApp?.dataset.conversationId ||
+        document.querySelector(".chat-item.active")?.dataset.conversationId ||
+        null;
 
+    let isSending = false;
+
+
+    // ==============================
+    // CSRF Token
+    // ==============================
+
+    function getCookie(name) {
+
+        const cookies = document.cookie.split(";");
+
+        for (let cookie of cookies) {
+
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + "=")) {
+                return decodeURIComponent(
+                    cookie.substring(name.length + 1)
+                );
+            }
+        }
+
+        return null;
+    }
+
+
+    function getCsrfToken() {
+
+        return (
+            getCookie("csrftoken") ||
+            document.querySelector(
+                '[name="csrfmiddlewaretoken"]'
+            )?.value ||
+            ""
+        );
+    }
+
+
+    // ==============================
+    // Scroll To Bottom
+    // ==============================
+
+    function scrollToBottom() {
+        if (!messageList) return;
+
+        messageList.scrollTop = messageList.scrollHeight;
+    }
+
+
+    // ==============================
+    // Render Message
+    // ==============================
+
+    function renderMessage(data) {
+
+        const message = document.createElement("div");
+
+        message.classList.add(
+            "message",
+            data.is_mine ? "sent" : "received"
+        );
+
+        const paragraph = document.createElement("p");
+
+        paragraph.textContent = data.content;
+
+        const time = document.createElement("small");
+
+        time.textContent = data.created_at;
+
+        message.appendChild(paragraph);
+        message.appendChild(time);
+
+        messageList.appendChild(message);
+
+        scrollToBottom();
+    }
+
+
+    // ==============================
     // Select Chat
+    // ==============================
+
     chatItems.forEach(item => {
 
         item.addEventListener("click", () => {
@@ -28,86 +118,195 @@ document.addEventListener("DOMContentLoaded", () => {
 
             item.classList.add("active");
 
-            headerName.textContent = item.dataset.name;
-            headerAvatar.textContent = item.dataset.avatar;
-            headerStatus.textContent = item.dataset.status;
+            conversationId = item.dataset.conversationId || null;
 
-            chatApp.classList.add("chat-open");
+            if (chatApp) {
+                chatApp.dataset.conversationId = conversationId || "";
+                chatApp.classList.add("chat-open");
+            }
+
+            if (headerName) {
+                headerName.textContent = item.dataset.name || "";
+            }
+
+            if (headerAvatar) {
+                headerAvatar.textContent = item.dataset.avatar || "";
+            }
+
+            if (headerStatus) {
+                headerStatus.textContent = item.dataset.status || "";
+            }
 
         });
 
     });
 
 
+    // ==============================
     // Back Button
-    backBtn.addEventListener("click", () => {
+    // ==============================
 
-        chatApp.classList.remove("chat-open");
+    if (backBtn) {
 
-    });
+        backBtn.addEventListener("click", () => {
 
+            chatApp?.classList.remove("chat-open");
 
-    // Send Message (Frontend Demo)
-    function sendMessage() {
-
-        const text = messageInput.value.trim();
-
-        if (!text) {
-            return;
-        }
-
-        const message = document.createElement("div");
-        message.classList.add("message", "sent");
-
-        const paragraph = document.createElement("p");
-        paragraph.textContent = text;
-
-        const time = document.createElement("small");
-
-        const now = new Date();
-
-        time.textContent = now.toLocaleTimeString("fa-IR", {
-            hour: "2-digit",
-            minute: "2-digit"
         });
-
-        message.appendChild(paragraph);
-        message.appendChild(time);
-
-        messageList.appendChild(message);
-
-        messageInput.value = "";
-
-        messageList.scrollTop = messageList.scrollHeight;
 
     }
 
 
-    sendBtn.addEventListener("click", sendMessage);
+    // ==============================
+    // Send Message - Django API
+    // ==============================
 
+    async function sendMessage() {
 
-    messageInput.addEventListener("keydown", event => {
+        const content = messageInput?.value.trim();
 
-        if (event.key === "Enter") {
-            sendMessage();
+        if (!content || isSending) {
+            return;
         }
 
-    });
+        if (!conversationId) {
+
+            alert("لطفاً ابتدا یک گفتگو انتخاب کنید.");
+
+            return;
+        }
+
+        isSending = true;
+
+        if (sendBtn) {
+            sendBtn.disabled = true;
+        }
+
+        try {
+
+            const response = await fetch(
+                chatApp.dataset.sendUrl,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": getCsrfToken(),
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+
+                    credentials: "same-origin",
+
+                    body: new URLSearchParams({
+                        content: content
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.error || "ارسال پیام با خطا مواجه شد."
+                );
+            }
+
+            // Add message after successful database save
+            renderMessage(data.message);
+
+            // Clear input
+            messageInput.value = "";
+
+            messageInput.focus();
+
+        } catch (error) {
+
+            console.error("Send Message Error:", error);
+
+            alert(error.message || "خطا در ارتباط با سرور.");
+
+        } finally {
+
+            isSending = false;
+
+            if (sendBtn) {
+                sendBtn.disabled = false;
+            }
+
+        }
+
+    }
 
 
-    // Search Chats
-    chatSearch.addEventListener("input", () => {
+    // ==============================
+    // Send Button
+    // ==============================
 
-        const query = chatSearch.value.trim().toLowerCase();
+    if (sendBtn) {
 
-        chatItems.forEach(item => {
+        sendBtn.addEventListener("click", sendMessage);
 
-            const name = item.dataset.name.toLowerCase();
+    }
 
-            item.style.display = name.includes(query) ? "flex" : "none";
+
+    // ==============================
+    // Enter Key
+    // ==============================
+
+    if (messageInput) {
+
+        messageInput.addEventListener("keydown", event => {
+
+            if (event.key === "Enter" && !event.shiftKey) {
+
+                event.preventDefault();
+
+                sendMessage();
+
+            }
 
         });
 
+    }
+
+
+    // ==============================
+    // Search Chats
+    // ==============================
+
+    if (chatSearch) {
+
+        chatSearch.addEventListener("input", () => {
+
+            const query = chatSearch.value.trim().toLowerCase();
+
+            chatItems.forEach(item => {
+
+                const name = (
+                    item.dataset.name || ""
+                ).toLowerCase();
+
+                item.style.display = name.includes(query)
+                    ? "flex"
+                    : "none";
+
+            });
+
+        });
+
+    }
+
+
+    // ==============================
+    // Initial Scroll
+    // ==============================
+
+    // بعد از بارگذاری کامل صفحه، نمایش آخرین پیام
+    window.addEventListener("load", () => {
+        requestAnimationFrame(() => {
+            scrollToBottom();
+        });
     });
 
 });
