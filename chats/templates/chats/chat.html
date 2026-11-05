@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
@@ -20,36 +19,50 @@
 
 <body>
 
-<div class="chat-app"
+<div class="chat-app{% if selected_conversation %} conversation-open{% endif %}"
      id="chatApp"
      data-conversation-id="{{ selected_conversation.id|default:'' }}"
      {% if selected_conversation %}
-     data-send-url="{% url 'chats:send_message' selected_conversation.id %}"
+         data-send-url="{% url 'chats:send_message' selected_conversation.id %}"
      {% endif %}>
 
     <!-- Sidebar -->
     <aside class="sidebar">
 
         <div class="sidebar-header">
+
             <div class="brand">
                 <i class="bi bi-chat-dots-fill"></i>
                 <span>پیام‌رسان</span>
             </div>
 
-            <button class="icon-btn" aria-label="منو">
-                <i class="bi bi-three-dots-vertical"></i>
-            </button>
+            <div class="d-flex gap-2">
+
+                <button class="icon-btn"
+                        id="newPrivateChatBtn"
+                        type="button"
+                        title="چت خصوصی جدید">
+                    <i class="bi bi-person-plus"></i>
+                </button>
+
+                <button class="icon-btn"
+                        id="newGroupChatBtn"
+                        type="button"
+                        title="گروه جدید">
+                    <i class="bi bi-people-fill"></i>
+                </button>
+
+            </div>
+
         </div>
 
         <!-- Search -->
         <div class="search-box">
             <i class="bi bi-search"></i>
 
-            <input
-                type="text"
-                id="chatSearch"
-                placeholder="جستجوی گفتگو..."
-            >
+            <input type="text"
+                   id="chatSearch"
+                   placeholder="جستجوی گفتگو...">
         </div>
 
         <!-- Chat List -->
@@ -60,25 +73,29 @@
                 <a href="{% url 'chats:conversation' membership.conversation.id %}"
                    class="chat-item {% if selected_conversation.id == membership.conversation.id %}active{% endif %}"
                    data-conversation-id="{{ membership.conversation.id }}"
-                   style="text-decoration: none; color: inherit;">
+                   data-name="{{ membership.display_title|escapejs }}"
+                   style="text-decoration:none;color:inherit;">
 
                     <div class="avatar">
-                        {{ membership.conversation.title|first|default:"گ" }}
+                        {{ membership.display_title|first|default:"گ" }}
                     </div>
 
                     <div class="chat-info">
 
                         <div class="chat-top">
+
                             <strong>
-                                {{ membership.conversation.title|default:"گفتگوی بدون عنوان" }}
+                                {{ membership.display_title }}
                             </strong>
 
                             <small>
                                 {{ membership.conversation.updated_at|date:"H:i" }}
                             </small>
+
                         </div>
 
                         <div class="chat-bottom">
+
                             <span>
                                 {% with last_message=membership.conversation.messages.last %}
                                     {% if last_message %}
@@ -88,6 +105,7 @@
                                     {% endif %}
                                 {% endwith %}
                             </span>
+
                         </div>
 
                     </div>
@@ -114,35 +132,38 @@
 
             <button class="icon-btn back-btn"
                     id="backBtn"
+                    type="button"
                     aria-label="بازگشت">
                 <i class="bi bi-arrow-right"></i>
             </button>
 
-            <div class="avatar online" id="headerAvatar">
-                ع
+            <div class="avatar" id="headerAvatar">
+                {{ selected_display_title|first|default:"گ" }}
             </div>
 
             <div class="header-info">
+
                 <strong id="headerName">
-                    {{ selected_conversation.title|default:"گفتگوها" }}
+                    {{ selected_display_title }}
                 </strong>
 
                 <small id="headerStatus">
                     آنلاین
                 </small>
+
             </div>
 
             <div class="header-actions">
 
-                <button class="icon-btn" aria-label="جستجو">
+                <button class="icon-btn" type="button" aria-label="جستجو">
                     <i class="bi bi-search"></i>
                 </button>
 
-                <button class="icon-btn" aria-label="تماس">
+                <button class="icon-btn" type="button" aria-label="تماس">
                     <i class="bi bi-telephone"></i>
                 </button>
 
-                <button class="icon-btn" aria-label="منو">
+                <button class="icon-btn" type="button" aria-label="منو">
                     <i class="bi bi-three-dots-vertical"></i>
                 </button>
 
@@ -157,14 +178,24 @@
 
                 <div class="message {% if message.sender_id == request.user.pk %}sent{% else %}received{% endif %}">
 
+                    {% if selected_conversation.type == 'GROUP' and message.sender_id != request.user.pk %}
+
+                        <div class="message-sender">
+                            {{ message.sender.first_name|default:message.sender.mobile }}
+                        </div>
+
+                    {% endif %}
+
                     <p>{{ message.content }}</p>
 
                     <small>
+
                         {{ message.created_at|date:"H:i" }}
 
                         {% if message.sender_id == request.user.pk %}
                             <i class="bi bi-check2-all"></i>
                         {% endif %}
+
                     </small>
 
                 </div>
@@ -172,11 +203,13 @@
             {% empty %}
 
                 <div class="empty-messages">
+
                     <i class="bi bi-chat-square-text"></i>
 
                     <p>
                         هنوز پیامی در این گفتگو وجود ندارد.
                     </p>
+
                 </div>
 
             {% endfor %}
@@ -188,19 +221,18 @@
 
             {% csrf_token %}
 
-            <button class="icon-btn" aria-label="پیوست">
+            <button class="icon-btn" type="button" aria-label="پیوست">
                 <i class="bi bi-paperclip"></i>
             </button>
 
-            <input
-                type="text"
-                id="messageInput"
-                placeholder="پیام خود را بنویسید..."
-                autocomplete="off"
-            >
+            <input type="text"
+                   id="messageInput"
+                   placeholder="پیام خود را بنویسید..."
+                   autocomplete="off">
 
             <button class="send-btn"
                     id="sendBtn"
+                    type="button"
                     aria-label="ارسال پیام">
 
                 <i class="bi bi-send-fill"></i>
@@ -211,7 +243,201 @@
 
     </main>
 
+    <!-- Private Chat Modal -->
+    <div class="modal fade"
+         id="privateChatModal"
+         tabindex="-1"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <form id="privateChatForm">
+
+                    {% csrf_token %}
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">
+                            شروع چت خصوصی
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close ms-0"
+                                data-bs-dismiss="modal"
+                                aria-label="بستن">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <label for="privateContact" class="form-label">
+                            انتخاب مخاطب
+                        </label>
+
+                        <select class="form-select"
+                                id="privateContact"
+                                name="contact_id"
+                                required>
+
+                            <option value="">
+                                یک کاربر را انتخاب کنید
+                            </option>
+
+                            {% for user in users %}
+
+                                <option value="{{ user.pk }}">
+                                    {{ user.first_name }} {{ user.last_name }} — {{ user.mobile }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="alert alert-danger d-none mt-3"
+                             id="privateChatError">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button"
+                                class="btn btn-light"
+                                data-bs-dismiss="modal">
+                            انصراف
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary"
+                                id="privateChatSubmit">
+                            رفتن به گفتگو
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Group Chat Modal -->
+    <div class="modal fade"
+         id="groupChatModal"
+         tabindex="-1"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <form id="groupChatForm">
+
+                    {% csrf_token %}
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">
+                            ایجاد گروه جدید
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close ms-0"
+                                data-bs-dismiss="modal"
+                                aria-label="بستن">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+
+                            <label for="groupTitle" class="form-label">
+                                نام گروه
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="groupTitle"
+                                   name="title"
+                                   maxlength="150"
+                                   required
+                                   placeholder="مثلاً گروه دوستان">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label for="groupMembers" class="form-label">
+                                اعضای گروه
+                            </label>
+
+                            <select class="form-select"
+                                    id="groupMembers"
+                                    name="members"
+                                    multiple
+                                    size="6">
+
+                                {% for user in users %}
+
+                                    {% if user.pk != request.user.pk %}
+
+                                        <option value="{{ user.pk }}">
+                                            {{ user.first_name }} {{ user.last_name }} — {{ user.mobile }}
+                                        </option>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </select>
+
+                            <div class="form-text">
+                                برای انتخاب چند عضو، کلید Ctrl را نگه دارید.
+                                سازنده گروه به‌صورت خودکار عضو می‌شود.
+                            </div>
+
+                        </div>
+
+                        <div class="alert alert-danger d-none"
+                             id="groupChatError">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button"
+                                class="btn btn-light"
+                                data-bs-dismiss="modal">
+                            انصراف
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary"
+                                id="groupChatSubmit">
+                            ایجاد گروه
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="{% static 'chats/js/chat.js' %}"></script>
 

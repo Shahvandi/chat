@@ -23,6 +23,13 @@ class Conversation(models.Model):
         default=''
     )
 
+    private_key = models.CharField(
+        max_length=100,
+        unique=True,
+        null=True,
+        blank=True,
+    )
+
     type = models.CharField(
         max_length=10,
         choices=ConversationType.choices,
@@ -93,6 +100,34 @@ class ConversationMember(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.conversation}'
+
+    @property
+    def display_title(self):
+
+        conversation = self.conversation
+
+        if conversation.type == Conversation.ConversationType.GROUP:
+            return conversation.title or 'گروه بدون عنوان'
+
+        other_member = next(
+            (
+                member
+                for member in conversation.members.all()
+                if member.user_id != self.user_id
+            ),
+            None
+        )
+
+        if other_member is None:
+            return conversation.title or 'پیام‌های شخصی'
+
+        user = other_member.user
+
+        return (
+            f'{user.first_name} {user.last_name}'.strip()
+            or getattr(user, 'mobile', '')
+            or 'کاربر'
+        )
 
 
 class Message(models.Model):
