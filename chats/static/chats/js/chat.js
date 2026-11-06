@@ -13,6 +13,140 @@ document.addEventListener("DOMContentLoaded", () => {
     let conversationId = chatApp?.dataset.conversationId || null;
     let isSending = false;
 
+
+    // ==============================
+    // WebSocket - Online / Offline
+    // ==============================
+
+    const headerStatus = document.getElementById("headerStatus");
+
+    const peerUserId = chatApp?.dataset.peerUserId || null;
+
+    const isSelfChat = !peerUserId;
+
+    if (isSelfChat && headerStatus) {
+        headerStatus.hidden = true;
+    }
+
+    let presenceSocket = null;
+    let reconnectTimer = null;
+
+    function updatePresence(userId, isOnline) {
+
+        // Update sidebar presence dots
+        document.querySelectorAll("[data-presence-user-id]")
+            .forEach(dot => {
+
+                if (dot.dataset.presenceUserId === userId) {
+                    dot.classList.toggle("is-online", isOnline);
+                }
+
+            });
+
+        // Update selected conversation header
+        if (!isSelfChat && peerUserId === userId && headerStatus) {
+
+            headerStatus.textContent = isOnline
+                ? "آنلاین"
+                : "آفلاین";
+
+            headerStatus.classList.toggle(
+                "is-online",
+                isOnline
+            );
+        }
+    }
+
+    function connectPresence() {
+
+        if (
+            presenceSocket &&
+            (
+                presenceSocket.readyState === WebSocket.OPEN ||
+                presenceSocket.readyState === WebSocket.CONNECTING
+            )
+        ) {
+            return;
+        }
+
+        const protocol = window.location.protocol === "https:"
+            ? "wss:"
+            : "ws:";
+
+        const socketUrl =
+            `${protocol}//${window.location.host}/ws/presence/`;
+
+        presenceSocket = new WebSocket(socketUrl);
+
+        presenceSocket.onopen = () => {
+
+            console.log("Presence WebSocket Connected");
+
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+                reconnectTimer = null;
+            }
+        };
+
+        presenceSocket.onmessage = event => {
+
+            const data = JSON.parse(event.data);
+
+            // Initial online users
+            if (data.type === "presence.snapshot") {
+
+                // ابتدا همه کاربران را Offline فرض می‌کنیم
+                document.querySelectorAll("[data-presence-user-id]")
+                    .forEach(dot => {
+                        dot.classList.remove("is-online");
+                    });
+
+                if (!isSelfChat && headerStatus) {
+                    headerStatus.textContent = "آفلاین";
+                    headerStatus.classList.remove("is-online");
+                }
+
+                data.users.forEach(user => {
+                    updatePresence(user.user_id, true);
+                });
+
+                return;
+            }
+
+            // Online / Offline event
+            if (data.type === "presence.update") {
+
+                updatePresence(
+                    data.user_id,
+                    data.is_online
+                );
+            }
+        };
+
+        presenceSocket.onerror = error => {
+
+            console.error("Presence WebSocket Error:", error);
+
+            presenceSocket.close();
+        };
+
+        presenceSocket.onclose = () => {
+
+            console.log("Presence WebSocket Disconnected");
+
+            if (headerStatus) {
+                headerStatus.textContent = "اتصال قطع شد";
+                headerStatus.classList.remove("is-online");
+            }
+
+            reconnectTimer = setTimeout(() => {
+                connectPresence();
+            }, 3000);
+        };
+    }
+
+    connectPresence();
+
     // CSRF
     function getCookie(name) {
         const cookies = document.cookie.split(";");
@@ -109,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     "X-Requested-With": "XMLHttpRequest"
                 },
                 credentials: "same-origin",
-                body: new URLSearchParams({ content })
+                body: new URLSearchParams({content})
             });
 
             const data = await response.json();
@@ -160,13 +294,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Create Chat Forms
     function setupCreateForm({
-        buttonId,
-        modalId,
-        formId,
-        url,
-        errorId,
-        submitId
-    }) {
+                                 buttonId,
+                                 modalId,
+                                 formId,
+                                 url,
+                                 errorId,
+                                 submitId
+                             }) {
         const button = document.getElementById(buttonId);
         const modalElement = document.getElementById(modalId);
         const form = document.getElementById(formId);

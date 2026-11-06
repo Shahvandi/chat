@@ -31,6 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -132,3 +135,14 @@ MAILERS = {
 AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_URL = '/admin/'
+
+# ASGI Configuration
+ASGI_APPLICATION = "config.asgi.application"
+
+# todo: CHANNEL_LAYERS to Redis for multi worker in Production
+# Django Channels - InMemory
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}

@@ -471,3 +471,37 @@ body {
         display: flex;
     }
 }
+
+
+/* Online / Offline */
+
+.avatar {
+    position: relative;
+}
+
+.presence-dot {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+
+    width: 12px;
+    height: 12px;
+
+    background: #adb5bd;
+    border: 2px solid #fff;
+    border-radius: 50%;
+
+    transition: background .2s ease;
+}
+
+.presence-dot.is-online {
+    background: #20c997;
+}
+
+#headerStatus {
+    color: #9298a6;
+}
+
+#headerStatus.is-online {
+    color: #20a36a;
+}

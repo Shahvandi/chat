@@ -22,9 +22,17 @@
 <div class="chat-app{% if selected_conversation %} conversation-open{% endif %}"
      id="chatApp"
      data-conversation-id="{{ selected_conversation.id|default:'' }}"
-     {% if selected_conversation %}
-         data-send-url="{% url 'chats:send_message' selected_conversation.id %}"
-     {% endif %}>
+        {% if selected_conversation %}
+     data-send-url="{% url 'chats:send_message' selected_conversation.id %}"
+        {% endif %}
+
+        {% if selected_conversation.type == 'PRIVATE' %}
+            {% for member in selected_conversation.members.all %}
+                {% if member.user_id != request.user.pk %}
+     data-peer-user-id="{{ member.user_id }}"
+                {% endif %}
+            {% endfor %}
+        {% endif %}>
 
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -77,7 +85,20 @@
                    style="text-decoration:none;color:inherit;">
 
                     <div class="avatar">
+
                         {{ membership.display_title|first|default:"گ" }}
+
+                        {% if membership.conversation.type == 'PRIVATE' %}
+                            {% for member in membership.conversation.members.all %}
+                                {% if member.user_id != request.user.pk %}
+                                    <span
+                                            class="presence-dot"
+                                            data-presence-user-id="{{ member.user_id }}">
+                                    </span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
                     </div>
 
                     <div class="chat-info">
@@ -148,7 +169,7 @@
                 </strong>
 
                 <small id="headerStatus">
-                    آنلاین
+                    در حال بررسی وضعیت ...
                 </small>
 
             </div>
