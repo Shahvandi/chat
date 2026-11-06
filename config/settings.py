@@ -23,9 +23,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-q34t9q0gc#1rc!*hs*sk!2jj6vb4i%$u%%%5o_*t8**7_%5ud)"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "shahvandi.ir",
+    "www.shahvandi.ir",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://shahvandi.ir",
+    "https://www.shahvandi.ir",
+]
 
 
 # Application definition
@@ -47,6 +55,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -120,8 +130,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = "static/"
+# STATIC_URL = '/static/'
+#
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+#
+# STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# Static Files
+STATIC_URL = '/public/static/'
+STATIC_ROOT = BASE_DIR / 'public' / 'static'
+
+# Media Files
+MEDIA_URL = '/public/media/'
+MEDIA_ROOT = BASE_DIR / 'public' / 'media'
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
@@ -145,5 +166,14 @@ ASGI_APPLICATION = "config.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
