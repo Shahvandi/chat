@@ -134,7 +134,8 @@ MAILERS = {
 
 AUTH_USER_MODEL = 'accounts.User'
 
-LOGIN_URL = '/admin/'
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
 
 # ASGI Configuration
 ASGI_APPLICATION = "config.asgi.application"

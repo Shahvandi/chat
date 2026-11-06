@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import (Sign, SignIn, SendOtp, CheckOtp, SignUp, SignOut)
+from .views import Sign, SignIn, SendOtp, CheckOtp, SignUp, SignOut
+from .views import CustomLoginView, CustomLogoutView
 
 
 app_name = 'accounts'
@@ -10,4 +11,6 @@ urlpatterns = [
     path('check-otp/', CheckOtp.as_view(), name='check_otp'),
     path('sign-up/', SignUp.as_view(), name='sign_up'),
     path('sign-out/', SignOut.as_view(), name='sign_out'),
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('', CustomLogoutView.as_view(), name='logout'),
 ]

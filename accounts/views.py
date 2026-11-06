@@ -5,7 +5,20 @@ from django.contrib import messages
 from random import randint
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect
 
+
+class CustomLoginView(LoginView):
+    def get_success_url(self):
+        if self.request.user.is_superuser:
+            return '/admin/'
+        return '/'
+
+class CustomLogoutView(View):
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect('/')
 
 class Sign(View):
     def get(self, *args, **kwargs):

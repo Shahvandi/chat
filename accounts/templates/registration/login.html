@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <style>
+        :root {
+            --bg: #0b1020;
+            --card: #141d33;
+            --purple: #a78bfa;
+            --blue: #60a5fa;
+            --text: #f1f5f9;
+            --muted: #aab5cc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background:
+                radial-gradient(circle at top right, #292052, transparent 35%),
+                var(--bg);
+            color: var(--text);
+            line-height: 1.9;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: min(1050px, 92%);
+            margin: auto;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 55px;
+            align-items: center;
+            padding: 50px 0;
+        }
+
+        .intro h1 {
+            font-size: clamp(30px, 5vw, 45px);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .intro h1 span {
+            color: var(--purple);
+        }
+
+        .intro h3 {
+            color: var(--blue);
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .description {
+            color: var(--muted);
+            font-size: 15px;
+            max-width: 500px;
+        }
+
+        .profile {
+            background: linear-gradient(145deg, #1c2845, #11182b);
+            border: 1px solid #ffffff15;
+            border-radius: 25px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px #0004;
+            direction: ltr;
+        }
+
+        .login-title {
+            text-align: center;
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .login-description {
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 52px;
+            padding: 0 15px;
+            border: 1px solid #ffffff20;
+            border-radius: 12px;
+            outline: none;
+            background: #0b1020;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px #a78bfa20;
+        }
+
+        .login-button {
+            width: 100%;
+            height: 52px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(120deg, #7c3aed, #2563eb);
+            color: white;
+            font-family: inherit;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px #7c3aed40;
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 25px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .forgot-password:hover {
+            color: var(--purple);
+        }
+
+        @media (max-width: 750px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 35px;
+                padding: 50px 0;
+            }
+
+            .intro {
+                text-align: center;
+            }
+
+            .description {
+                margin: auto;
+            }
+
+            .profile {
+                width: 100%;
+                max-width: 430px;
+                margin: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <main class="hero">
+
+        <section class="intro">
+
+            <h2>
+                سلام
+                <br>
+                من <span>لقمان کیانی شاهوندی</span> هستم.
+            </h2>
+            <hr><br>
+
+            <h3>برنامه‌نویس پایتون و توسعه‌دهنده وب</h3>
+
+            <p class="description">
+                من یک برنامه‌نویس علاقه‌مند به طراحی و توسعه
+                نرم‌افزارهای کاربردی هستم. تمرکز من بر ساخت
+                وب‌سایت‌های سریع، امن و قابل توسعه با استفاده
+                از فناوری‌های مدرن است.
+            </p>
+
+        </section>
+
+        <section class="profile">
+
+            <h2 class="login-title">Welcome Back</h2>
+
+            <p class="login-description">
+                Please login to your account
+            </p>
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_username">Username</label>
+
+                    <input
+                        type="text"
+                        name="username"
+                        id="id_username"
+                        class="form-control"
+                        placeholder="Enter your username"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password">Password</label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="id_password"
+                        class="form-control"
+                        placeholder="Enter your password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="login-button">
+                    Login
+                </button>
+
+                <a href="#" class="forgot-password">
+                    Forgot Password?
+                </a>
+
+            </form>
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
