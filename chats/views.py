@@ -267,8 +267,10 @@ def create_group_conversation(request):
     })
 
 
+
 @login_required
 @require_POST
+@transaction.atomic
 def send_message(request, conversation_id):
 
     membership = get_object_or_404(
@@ -285,16 +287,12 @@ def send_message(request, conversation_id):
             'error': 'متن پیام نمی‌تواند خالی باشد.'
         }, status=400)
 
+    # Create message.
+    # Conversation.updated_at is handled by signals.py.
     message = Message.objects.create(
         conversation=membership.conversation,
         sender=request.user,
         content=content
-    )
-
-    Conversation.objects.filter(
-        pk=conversation_id
-    ).update(
-        updated_at=timezone.now()
     )
 
     return JsonResponse({
