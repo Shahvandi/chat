@@ -21,6 +21,7 @@
 
 <div class="chat-app{% if selected_conversation %} conversation-open{% endif %}"
      id="chatApp"
+     data-user-id="{{ request.user.pk }}"
      data-conversation-id="{{ selected_conversation.id|default:'' }}"
         {% if selected_conversation %}
      data-send-url="{% url 'chats:send_message' selected_conversation.id %}"

@@ -24,15 +24,22 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
             or user.mobile
         )
 
-        # اضافه کردن اتصال به گروه عمومی حضور
+        # گروه عمومی حضور کاربران
         await self.channel_layer.group_add(
             "presence",
             self.channel_name
         )
 
+        # گروه اختصاصی اعلان‌های این کاربر
+        self.notification_group = f"user.{self.user_id}"
+
+        await self.channel_layer.group_add(
+            self.notification_group,
+            self.channel_name
+        )
+
         await self.accept()
 
-        # بررسی اینکه کاربر قبلاً اتصال فعال داشته یا خیر
         already_online = self.user_id in self.online_users
 
         if not already_online:
@@ -45,7 +52,7 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name
         )
 
-        # ارسال فهرست کاربران آنلاین به کاربر جدید
+        # ارسال وضعیت کاربران آنلاین
         await self.send_json({
             "type": "presence.snapshot",
             "users": [
@@ -57,7 +64,6 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
             ],
         })
 
-        # فقط اولین اتصال کاربر، Online اعلام می‌شود
         if not already_online:
             await self.broadcast_status(True)
 
@@ -75,7 +81,6 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
                     self.channel_name
                 )
 
-                # اگر هنوز اتصال دیگری وجود دارد، آنلاین می‌ماند
                 if not user_data["channels"]:
 
                     self.online_users.pop(user_id, None)
@@ -86,6 +91,19 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
             "presence",
             self.channel_name
         )
+
+        notification_group = getattr(
+            self,
+            "notification_group",
+            None
+        )
+
+        if notification_group:
+
+            await self.channel_layer.group_discard(
+                notification_group,
+                self.channel_name
+            )
 
     async def broadcast_status(self, is_online):
 
@@ -106,4 +124,12 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
             "user_id": event["user_id"],
             "name": event["name"],
             "is_online": event["is_online"],
+        })
+
+    # دریافت اعلان پیام جدید
+    async def chat_message(self, event):
+
+        await self.send_json({
+            "type": "chat.message",
+            "message": event["message"],
         })

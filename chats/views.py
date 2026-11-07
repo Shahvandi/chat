@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 import uuid
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -267,6 +269,30 @@ def create_group_conversation(request):
     })
 
 
+def broadcast_message_notification(user_ids, message_payload):
+    """
+    ارسال اعلان پیام به گروه اختصاصی هر کاربر.
+    این تابع بعد از Commit موفق دیتابیس اجرا می‌شود.
+    """
+
+    channel_layer = get_channel_layer()
+
+    if channel_layer is None:
+        return
+
+    event = {
+        "type": "chat.message",
+        "message": message_payload,
+    }
+
+    for user_id in user_ids:
+
+        async_to_sync(channel_layer.group_send)(
+            f"user.{user_id}",
+            event
+        )
+
+
 
 @login_required
 @require_POST
@@ -287,27 +313,49 @@ def send_message(request, conversation_id):
             'error': 'متن پیام نمی‌تواند خالی باشد.'
         }, status=400)
 
-    # Create message.
-    # Conversation.updated_at is handled by signals.py.
+    # ذخیره پیام
     message = Message.objects.create(
         conversation=membership.conversation,
         sender=request.user,
         content=content
     )
 
+    sender_name = (
+        f'{request.user.first_name} {request.user.last_name}'.strip()
+        or request.user.mobile
+    )
+
+    # اطلاعات پیام برای WebSocket
+    message_payload = {
+        'id': str(message.id),
+        'conversation_id': str(message.conversation_id),
+        'content': message.content,
+        'sender_id': str(request.user.pk),
+        'sender_name': sender_name,
+        'created_at': timezone.localtime(
+            message.created_at
+        ).strftime('%H:%M'),
+    }
+
+    # دریافت شناسه تمام اعضای گفتگو
+    recipient_ids = tuple(
+        ConversationMember.objects.filter(
+            conversation_id=conversation_id
+        ).values_list('user_id', flat=True)
+    )
+
+    # ارسال اعلان فقط بعد از Commit موفق
+    transaction.on_commit(
+        lambda ids=recipient_ids, payload=message_payload:
+            broadcast_message_notification(ids, payload),
+        robust=True
+    )
+
+    # پاسخ HTTP برای فرستنده
     return JsonResponse({
         'success': True,
         'message': {
-            'id': str(message.id),
-            'content': message.content,
-            'sender_id': str(request.user.pk),
-            'sender_name': (
-                f'{request.user.first_name} {request.user.last_name}'.strip()
-                or request.user.mobile
-            ),
-            'created_at': timezone.localtime(
-                message.created_at
-            ).strftime('%H:%M'),
+            **message_payload,
             'is_mine': True,
         }
     })

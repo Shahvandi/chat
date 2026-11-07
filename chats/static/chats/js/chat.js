@@ -92,6 +92,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = JSON.parse(event.data);
 
+            // دریافت پیام جدید
+            if (data.type === "chat.message") {
+
+                handleIncomingChatMessage(data.message);
+
+                return;
+            }
+
             // Initial online users
             if (data.type === "presence.snapshot") {
 
@@ -188,28 +196,240 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Render Message
+    // جلوگیری از نمایش دوباره پیام دریافتی از HTTP و WebSocket
     function renderMessage(data) {
+
         if (!messageList || !data) return;
 
+        // بررسی پیام تکراری
+        if (
+            data.id &&
+            Array.from(messageList.children).some(
+                item => item.dataset.messageId === String(data.id)
+            )
+        ) {
+            return;
+        }
+
         messageList.querySelector(".empty-messages")?.remove();
+
+        const currentUserId = String(
+            chatApp?.dataset.userId || ""
+        );
+
+        const isMine = data.is_mine !== undefined
+            ? data.is_mine
+            : String(data.sender_id) === currentUserId;
 
         const message = document.createElement("div");
 
         message.classList.add(
             "message",
-            data.is_mine ? "sent" : "received"
+            isMine ? "sent" : "received"
         );
 
+        if (data.id) {
+            message.dataset.messageId = String(data.id);
+        }
+
+        // نام فرستنده در پیام‌های دریافتی
+        if (!isMine && data.sender_name) {
+
+            const sender = document.createElement("div");
+
+            sender.className = "message-sender";
+            sender.textContent = data.sender_name;
+
+            message.appendChild(sender);
+        }
+
         const paragraph = document.createElement("p");
+
         paragraph.textContent = data.content;
 
         const time = document.createElement("small");
+
         time.textContent = data.created_at || "";
 
         message.append(paragraph, time);
+
         messageList.appendChild(message);
 
         initializeMessageScroll();
+    }
+
+    // به‌روزرسانی پیش‌نمایش گفتگو در Sidebar
+    function updateConversationPreview(data) {
+
+        const item = Array.from(
+            document.querySelectorAll(".chat-item")
+        ).find(element =>
+            element.dataset.conversationId ===
+            String(data.conversation_id)
+        );
+
+        if (!item) return;
+
+        const preview = item.querySelector(
+            ".chat-bottom span"
+        );
+
+        const time = item.querySelector(
+            ".chat-top small"
+        );
+
+        if (preview) {
+            preview.textContent = data.content || "";
+        }
+
+        if (time) {
+            time.textContent = data.created_at || "";
+        }
+
+        // انتقال گفتگو به ابتدای فهرست
+        if (item.parentElement) {
+            item.parentElement.insertBefore(
+                item,
+                item.parentElement.firstChild
+            );
+        }
+    }
+
+    // نمایش اعلان Toast
+    function showMessageToast(data) {
+
+        if (!window.bootstrap?.Toast) return;
+
+        let container = document.getElementById(
+            "messageToastContainer"
+        );
+
+        if (!container) {
+
+            container = document.createElement("div");
+
+            container.id = "messageToastContainer";
+
+            container.className =
+                "toast-container position-fixed bottom-0 start-0 p-3";
+
+            container.style.zIndex = "1080";
+
+            document.body.appendChild(container);
+        }
+
+        const toastElement = document.createElement("div");
+
+        toastElement.className = "toast";
+
+        toastElement.setAttribute("role", "status");
+
+        toastElement.setAttribute("aria-live", "polite");
+
+        // Header
+        const header = document.createElement("div");
+
+        header.className = "toast-header";
+
+        const title = document.createElement("strong");
+
+        title.className = "me-auto";
+
+        const conversationItem = Array.from(
+            document.querySelectorAll(".chat-item")
+        ).find(item =>
+            item.dataset.conversationId ===
+            String(data.conversation_id)
+        );
+
+        title.textContent =
+            conversationItem?.dataset.name || "پیام جدید";
+
+        const close = document.createElement("button");
+
+        close.type = "button";
+
+        close.className = "btn-close";
+
+        close.setAttribute("data-bs-dismiss", "toast");
+
+        close.setAttribute("aria-label", "بستن");
+
+        header.append(title, close);
+
+        // Body
+        const body = document.createElement("div");
+
+        body.className = "toast-body";
+
+        body.textContent =
+            `${data.sender_name || "کاربر"}: ${data.content || ""}`;
+
+        body.style.cursor = "pointer";
+
+        body.addEventListener("click", () => {
+
+            const target = Array.from(
+                document.querySelectorAll(".chat-item")
+            ).find(item =>
+                item.dataset.conversationId ===
+                String(data.conversation_id)
+            );
+
+            if (
+                target &&
+                String(data.conversation_id) !==
+                String(conversationId)
+            ) {
+                window.location.href = target.href;
+            }
+        });
+
+        toastElement.append(header, body);
+
+        container.appendChild(toastElement);
+
+        const toast = new bootstrap.Toast(
+            toastElement,
+            { delay: 5000 }
+        );
+
+        toast.show();
+
+        toastElement.addEventListener(
+            "hidden.bs.toast",
+            () => toastElement.remove()
+        );
+    }
+
+    // مدیریت پیام دریافتی
+    function handleIncomingChatMessage(data) {
+
+        if (!data) return;
+
+        // به‌روزرسانی Sidebar
+        updateConversationPreview(data);
+
+        // اگر کاربر در همین گفتگو باشد
+        if (
+            String(data.conversation_id) ===
+            String(conversationId)
+        ) {
+
+            renderMessage(data);
+
+            return;
+        }
+
+        // جلوگیری از اعلان برای پیام خود کاربر
+        const currentUserId = String(
+            chatApp?.dataset.userId || ""
+        );
+
+        if (String(data.sender_id) !== currentUserId) {
+
+            showMessageToast(data);
+        }
     }
 
     // Back Button
