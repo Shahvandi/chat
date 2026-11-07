@@ -2,8 +2,8 @@ from django.urls import path
 from .views import Sign, SignIn, SendOtp, CheckOtp, SignUp, SignOut
 from .views import CustomLoginView, CustomLogoutView
 
-
 app_name = 'accounts'
+
 urlpatterns = [
     path('sign/', Sign.as_view(), name='sign'),
     path('sign-in/', SignIn.as_view(), name='sign_in'),
@@ -12,5 +12,5 @@ urlpatterns = [
     path('sign-up/', SignUp.as_view(), name='sign_up'),
     path('sign-out/', SignOut.as_view(), name='sign_out'),
     path('login/', CustomLoginView.as_view(), name='login'),
-    path('', CustomLogoutView.as_view(), name='logout'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
 ]
