@@ -163,6 +163,29 @@
 
         </div>
 
+        <!-- Sidebar Account -->
+        <div class="sidebar-account">
+
+            <div class="sidebar-account-avatar">
+                {{ request.user.first_name|first|default:"ک" }}
+            </div>
+
+            <div class="sidebar-account-info">
+
+                <strong> مشاهده پروفایل</strong>
+
+            </div>
+        
+            <a href="{% url 'accounts:profile' %}"
+               class="sidebar-profile-btn"
+               title="مشاهده پروفایل"
+               aria-label="مشاهده پروفایل">
+
+                <i class="bi bi-person-gear"></i>
+
+            </a>
+
+        </div>
     </aside>
 
     <!-- Main Chat -->
