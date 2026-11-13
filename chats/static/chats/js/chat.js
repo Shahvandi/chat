@@ -97,6 +97,22 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isGroupChat) {
             updateGroupOnlineCount();
         }
+
+        // به‌روزرسانی وضعیت اعضای گروه
+        document.querySelectorAll("[data-presence-label-user-id]")
+            .forEach(label => {
+
+                if (label.dataset.presenceLabelUserId === userId) {
+
+                    label.textContent = isOnline
+                        ? "آنلاین"
+                        : "آفلاین";
+
+                    label.classList.toggle("is-online", isOnline);
+                }
+
+            });
+
     }
 
 

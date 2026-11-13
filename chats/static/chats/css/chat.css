@@ -505,3 +505,79 @@ body {
 #headerStatus.is-online {
     color: #20a36a;
 }
+
+/* Group Members */
+
+.group-members-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.group-member-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid #f0f0f4;
+}
+
+.group-member-item:last-child {
+    border-bottom: none;
+}
+
+.group-member-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    font-size: 16px;
+}
+
+.group-member-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.group-member-info strong {
+    font-size: 13px;
+    color: #303747;
+}
+
+.group-member-info strong small {
+    color: #9298a6;
+    font-weight: normal;
+}
+
+.group-member-info > small {
+    font-size: 11px;
+    color: #9298a6;
+    direction: ltr;
+    text-align: right;
+}
+
+.group-member-presence {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.group-member-presence .presence-dot {
+    position: static;
+    display: inline-block;
+    flex-shrink: 0;
+    border: none;
+    width: 9px;
+    height: 9px;
+}
+
+.group-member-presence small {
+    font-size: 11px;
+    color: #9298a6;
+    white-space: nowrap;
+}
+
+.group-member-presence small.is-online {
+    color: #20a36a;
+}
