@@ -10,20 +10,20 @@
 
     <!-- Bootstrap RTL -->
     <link
-        rel="stylesheet"
-        href="{% static 'chats/bootstrap/bootstrap.rtl.min.css' %}"
+            rel="stylesheet"
+            href="{% static 'chats/bootstrap/bootstrap.rtl.min.css' %}"
     >
-    
+
     <!-- Bootstrap Icons -->
     <link
-        rel="stylesheet"
-        href="{% static 'chats/bootstrap/bootstrap-icons.min.css' %}"
+            rel="stylesheet"
+            href="{% static 'chats/bootstrap/bootstrap-icons.min.css' %}"
     >
-    
+
     <!-- Chat CSS -->
     <link
-        rel="stylesheet"
-        href="{% static 'chats/css/chat.css' %}"
+            rel="stylesheet"
+            href="{% static 'chats/css/chat.css' %}"
     >
 </head>
 
@@ -33,6 +33,7 @@
      id="chatApp"
      data-user-id="{{ request.user.pk }}"
      data-conversation-id="{{ selected_conversation.id|default:'' }}"
+     data-conversation-type="{{ selected_conversation.type|default:'' }}"
         {% if selected_conversation %}
      data-send-url="{% url 'chats:send_message' selected_conversation.id %}"
         {% endif %}
@@ -44,6 +45,14 @@
                 {% endif %}
             {% endfor %}
         {% endif %}>
+
+    {% if selected_conversation.type == 'GROUP' %}
+        <div id="groupMemberIds" hidden>
+            {% for member in selected_conversation.members.all %}
+                <span data-group-member-id="{{ member.user_id }}"></span>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <!-- Sidebar -->
     <aside class="sidebar">

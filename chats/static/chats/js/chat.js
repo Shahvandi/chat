@@ -21,27 +21,52 @@ document.addEventListener("DOMContentLoaded", () => {
     const headerStatus = document.getElementById("headerStatus");
 
     const peerUserId = chatApp?.dataset.peerUserId || null;
+    const conversationType = chatApp?.dataset.conversationType || null;
 
-    const isSelfChat = !peerUserId;
+    const isPrivateChat = conversationType === "PRIVATE";
+    const isGroupChat = conversationType === "GROUP";
 
-    if (isSelfChat && headerStatus) {
-        headerStatus.hidden = true;
+    const isSelfChat = isPrivateChat && !peerUserId;
+
+    // شناسه اعضای گروه انتخاب‌شده
+    const groupMemberIds = new Set(
+        [...document.querySelectorAll("[data-group-member-id]")]
+            .map(element => element.dataset.groupMemberId)
+    );
+
+    // کاربران آنلاین
+    const onlineUserIds = new Set();
+
+    if (headerStatus) {
+        headerStatus.hidden = isSelfChat || (!isPrivateChat && !isGroupChat);
     }
 
     let presenceSocket = null;
     let reconnectTimer = null;
-    let heartbeatTimer = null;
 
-    function stopHeartbeat() {
-        if (heartbeatTimer) {
-            clearInterval(heartbeatTimer);
-            heartbeatTimer = null;
-        }
+
+    function updateGroupOnlineCount() {
+
+        if (!isGroupChat || !headerStatus) return;
+
+        let count = 0;
+
+        groupMemberIds.forEach(userId => {
+            if (onlineUserIds.has(userId)) {
+                count++;
+            }
+        });
+
+        headerStatus.textContent =
+            `${count.toLocaleString("fa-IR")} نفر آنلاین`;
+
+        headerStatus.classList.toggle("is-online", count > 0);
     }
+
 
     function updatePresence(userId, isOnline) {
 
-        // Update sidebar presence dots
+        // به‌روزرسانی وضعیت کاربران در Sidebar
         document.querySelectorAll("[data-presence-user-id]")
             .forEach(dot => {
 
@@ -51,19 +76,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
             });
 
-        // Update selected conversation header
-        if (!isSelfChat && peerUserId === userId && headerStatus) {
+        // ثبت وضعیت آنلاین کاربران
+        if (isOnline) {
+            onlineUserIds.add(userId);
+        } else {
+            onlineUserIds.delete(userId);
+        }
+
+        // چت خصوصی
+        if (isPrivateChat && !isSelfChat && peerUserId === userId && headerStatus) {
 
             headerStatus.textContent = isOnline
                 ? "آنلاین"
                 : "آفلاین";
 
-            headerStatus.classList.toggle(
-                "is-online",
-                isOnline
-            );
+            headerStatus.classList.toggle("is-online", isOnline);
+        }
+
+        // چت گروهی
+        if (isGroupChat) {
+            updateGroupOnlineCount();
         }
     }
+
 
     function connectPresence() {
 
@@ -92,54 +127,47 @@ document.addEventListener("DOMContentLoaded", () => {
                 clearTimeout(reconnectTimer);
                 reconnectTimer = null;
             }
-
-            stopHeartbeat();
-
-            heartbeatTimer = setInterval(() => {
-
-                if (presenceSocket?.readyState === WebSocket.OPEN) {
-                    presenceSocket.send(JSON.stringify({
-                        type: "heartbeat"
-                    }));
-                }
-
-            }, 20000);
         };
 
         presenceSocket.onmessage = event => {
 
             const data = JSON.parse(event.data);
 
-            // دریافت پیام جدید
             if (data.type === "chat.message") {
-
                 handleIncomingChatMessage(data.message);
-
                 return;
             }
 
-            // Initial online users
+            // دریافت لیست اولیه کاربران آنلاین
             if (data.type === "presence.snapshot") {
 
-                // ابتدا همه کاربران را Offline فرض می‌کنیم
+                onlineUserIds.clear();
+
                 document.querySelectorAll("[data-presence-user-id]")
                     .forEach(dot => {
                         dot.classList.remove("is-online");
                     });
 
-                if (!isSelfChat && headerStatus) {
-                    headerStatus.textContent = "آفلاین";
-                    headerStatus.classList.remove("is-online");
-                }
-
                 data.users.forEach(user => {
                     updatePresence(user.user_id, true);
                 });
 
+                // وضعیت اولیه چت خصوصی
+                if (isPrivateChat && !isSelfChat && headerStatus) {
+
+                    const isOnline = onlineUserIds.has(peerUserId);
+
+                    headerStatus.textContent = isOnline
+                        ? "آنلاین"
+                        : "آفلاین";
+
+                    headerStatus.classList.toggle("is-online", isOnline);
+                }
+
                 return;
             }
 
-            // Online / Offline event
+            // تغییر وضعیت کاربران
             if (data.type === "presence.update") {
 
                 updatePresence(
@@ -153,17 +181,11 @@ document.addEventListener("DOMContentLoaded", () => {
             presenceSocket.close();
         };
 
-        presenceSocket.onclose = (event) => {
+        presenceSocket.onclose = () => {
 
-            stopHeartbeat();
-
-            if (headerStatus) {
+            if (headerStatus && !isSelfChat) {
                 headerStatus.textContent = "اتصال قطع شد";
                 headerStatus.classList.remove("is-online");
-            }
-
-            if (event.code === 4401) {
-                return;
             }
 
             reconnectTimer = setTimeout(() => {
