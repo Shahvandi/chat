@@ -30,6 +30,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let presenceSocket = null;
     let reconnectTimer = null;
+    let heartbeatTimer = null;
+
+    function stopHeartbeat() {
+        if (heartbeatTimer) {
+            clearInterval(heartbeatTimer);
+            heartbeatTimer = null;
+        }
+    }
 
     function updatePresence(userId, isOnline) {
 
@@ -80,12 +88,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         presenceSocket.onopen = () => {
 
-            console.log("Presence WebSocket Connected");
-
             if (reconnectTimer) {
                 clearTimeout(reconnectTimer);
                 reconnectTimer = null;
             }
+
+            stopHeartbeat();
+
+            heartbeatTimer = setInterval(() => {
+
+                if (presenceSocket?.readyState === WebSocket.OPEN) {
+                    presenceSocket.send(JSON.stringify({
+                        type: "heartbeat"
+                    }));
+                }
+
+            }, 20000);
         };
 
         presenceSocket.onmessage = event => {
@@ -131,20 +149,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         };
 
-        presenceSocket.onerror = error => {
-
-            console.error("Presence WebSocket Error:", error);
-
+        presenceSocket.onerror = () => {
             presenceSocket.close();
         };
 
-        presenceSocket.onclose = () => {
+        presenceSocket.onclose = (event) => {
 
-            console.log("Presence WebSocket Disconnected");
+            stopHeartbeat();
 
             if (headerStatus) {
                 headerStatus.textContent = "اتصال قطع شد";
                 headerStatus.classList.remove("is-online");
+            }
+
+            if (event.code === 4401) {
+                return;
             }
 
             reconnectTimer = setTimeout(() => {

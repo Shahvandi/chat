@@ -8,6 +8,23 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+
+def disconnect_user_presence(user):
+
+    if not user.is_authenticated:
+        return
+
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        f"user.{user.pk}",
+        {
+            "type": "force.disconnect",
+        }
+    )
 
 class CustomLoginView(LoginView):
     def get_success_url(self):
@@ -17,6 +34,7 @@ class CustomLoginView(LoginView):
 
 class CustomLogoutView(View):
     def get(self, request, *args, **kwargs):
+        disconnect_user_presence(request.user)
         logout(request)
         return redirect('/')
 

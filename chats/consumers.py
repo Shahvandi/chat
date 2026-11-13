@@ -1,13 +1,14 @@
+import asyncio
+import time
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 
 class PresenceConsumer(AsyncJsonWebsocketConsumer):
 
-    # user_id: {
-    #     "channels": set(),
-    #     "name": str
-    # }
     online_users = {}
+
+    HEARTBEAT_INTERVAL = 10
+    HEARTBEAT_TIMEOUT = 60
 
     async def connect(self):
 
@@ -24,13 +25,14 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
             or user.mobile
         )
 
-        # گروه عمومی حضور کاربران
+        self.last_seen = time.monotonic()
+        self.heartbeat_task = None
+
         await self.channel_layer.group_add(
             "presence",
             self.channel_name
         )
 
-        # گروه اختصاصی اعلان‌های این کاربر
         self.notification_group = f"user.{self.user_id}"
 
         await self.channel_layer.group_add(
@@ -52,7 +54,6 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name
         )
 
-        # ارسال وضعیت کاربران آنلاین
         await self.send_json({
             "type": "presence.snapshot",
             "users": [
@@ -67,7 +68,35 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
         if not already_online:
             await self.broadcast_status(True)
 
+        self.heartbeat_task = asyncio.create_task(
+            self.heartbeat_watchdog()
+        )
+
+    async def receive_json(self, content, **kwargs):
+
+        if content.get("type") == "heartbeat":
+            self.last_seen = time.monotonic()
+
+    async def heartbeat_watchdog(self):
+
+        try:
+            while True:
+
+                await asyncio.sleep(self.HEARTBEAT_INTERVAL)
+
+                elapsed = time.monotonic() - self.last_seen
+
+                if elapsed > self.HEARTBEAT_TIMEOUT:
+                    await self.close(code=4408)
+                    return
+
+        except asyncio.CancelledError:
+            return
+
     async def disconnect(self, close_code):
+
+        if self.heartbeat_task:
+            self.heartbeat_task.cancel()
 
         user_id = getattr(self, "user_id", None)
 
@@ -99,11 +128,13 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
         )
 
         if notification_group:
-
             await self.channel_layer.group_discard(
                 notification_group,
                 self.channel_name
             )
+
+    async def force_disconnect(self, event):
+        await self.close(code=4401)
 
     async def broadcast_status(self, is_online):
 
@@ -126,7 +157,6 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
             "is_online": event["is_online"],
         })
 
-    # دریافت اعلان پیام جدید
     async def chat_message(self, event):
 
         await self.send_json({
