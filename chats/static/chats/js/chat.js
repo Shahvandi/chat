@@ -569,6 +569,115 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Contact Picker
+
+    function setupContactSearch(searchId, listId, emptyId, countId = null) {
+
+        const searchInput = document.getElementById(searchId);
+        const list = document.getElementById(listId);
+        const emptyMessage = document.getElementById(emptyId);
+        const countElement = countId
+            ? document.getElementById(countId)
+            : null;
+
+        if (!searchInput || !list) return;
+
+        const updateList = () => {
+
+            const query = searchInput.value.trim().toLowerCase();
+
+            const contacts = [
+                ...list.querySelectorAll(".contact-option")
+            ];
+
+            let visibleCount = 0;
+
+            contacts.forEach(contact => {
+
+                const searchText = (
+                    contact.dataset.search || ""
+                ).toLowerCase();
+
+                const visible = searchText.includes(query);
+
+                contact.classList.toggle("d-none", !visible);
+
+                if (visible) visibleCount++;
+            });
+
+            if (emptyMessage) {
+                emptyMessage.classList.toggle(
+                    "d-none",
+                    visibleCount > 0
+                );
+            }
+
+            if (countElement) {
+                countElement.textContent =
+                    `${visibleCount.toLocaleString("fa-IR")} کاربر`;
+            }
+        };
+
+        searchInput.addEventListener("input", updateList);
+
+        return updateList;
+    }
+
+    function updateGroupSelectedCount() {
+
+        const countElement = document.getElementById(
+            "groupSelectedCount"
+        );
+
+        const selectedCount = document.querySelectorAll(
+            '#groupMemberList input[name="members"]:checked'
+        ).length;
+
+        if (countElement) {
+            countElement.textContent =
+                `${selectedCount.toLocaleString("fa-IR")} نفر انتخاب شده`;
+        }
+    }
+
+    const updatePrivateContacts = setupContactSearch(
+        "privateContactSearch",
+        "privateContactList",
+        "privateContactEmpty",
+        "privateContactCount"
+    );
+
+    const updateGroupContacts = setupContactSearch(
+        "groupMemberSearch",
+        "groupMemberList",
+        "groupMemberEmpty"
+    );
+
+    document.getElementById("groupMemberList")?.addEventListener(
+        "change",
+        updateGroupSelectedCount
+    );
+
+    document.getElementById("privateChatForm")?.addEventListener(
+        "reset",
+        () => {
+            setTimeout(() => updatePrivateContacts?.(), 0);
+        }
+    );
+
+    document.getElementById("groupChatForm")?.addEventListener(
+        "reset",
+        () => {
+            setTimeout(() => {
+                updateGroupContacts?.();
+                updateGroupSelectedCount();
+            }, 0);
+        }
+    );
+
+    updatePrivateContacts?.();
+    updateGroupContacts?.();
+    updateGroupSelectedCount();
+
     // Create Chat Forms
     function setupCreateForm({
                                  buttonId,

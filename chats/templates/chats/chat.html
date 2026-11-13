@@ -297,58 +297,115 @@
 
     </main>
 
+
     <!-- Private Chat Modal -->
     <div class="modal fade"
          id="privateChatModal"
          tabindex="-1"
          aria-hidden="true">
 
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
 
-            <div class="modal-content">
+            <div class="modal-content chat-modal">
 
                 <form id="privateChatForm">
 
                     {% csrf_token %}
 
-                    <div class="modal-header">
-
-                        <h5 class="modal-title">
-                            شروع چت خصوصی
-                        </h5>
-
+                    <div class="modal-header group-members-header">
+                    
+                        <div class="group-members-title">
+                    
+                            <span class="group-members-icon">
+                                <i class="bi bi-person-plus-fill"></i>
+                            </span>
+                    
+                            <div>
+                                <h5 class="modal-title">چت خصوصی</h5>
+                                <small>مخاطب موردنظر را انتخاب کنید</small>
+                            </div>
+                    
+                        </div>
+                    
                         <button type="button"
-                                class="btn-close ms-0"
+                                class="group-modal-close"
                                 data-bs-dismiss="modal"
                                 aria-label="بستن">
+                    
+                            <i class="bi bi-x-lg"></i>
+                    
                         </button>
-
+                    
                     </div>
 
                     <div class="modal-body">
 
-                        <label for="privateContact" class="form-label">
-                            انتخاب مخاطب
-                        </label>
+                        <div class="contact-search">
+                            <i class="bi bi-search"></i>
 
-                        <select class="form-select"
-                                id="privateContact"
-                                name="contact_id"
-                                required>
+                            <input type="text"
+                                   id="privateContactSearch"
+                                   placeholder="جستجوی نام یا شماره موبایل..."
+                                   autocomplete="off">
+                        </div>
 
-                            <option value="">
-                                یک کاربر را انتخاب کنید
-                            </option>
+                        <div class="picker-heading">
+                            <span>مخاطبان</span>
+                            <small id="privateContactCount">
+                                {{ users|length }} کاربر
+                            </small>
+                        </div>
+
+                        <div class="contact-picker"
+                             id="privateContactList">
 
                             {% for user in users %}
 
-                                <option value="{{ user.pk }}">
-                                    {{ user.first_name }} {{ user.last_name }} — {{ user.mobile }}
-                                </option>
+                                <label class="contact-option"
+                                       data-search="{{ user.first_name }} {{ user.last_name }} {{ user.mobile }}">
+
+                                    <input type="radio"
+                                           name="contact_id"
+                                           value="{{ user.pk }}"
+                                           required>
+
+                                    <span class="contact-avatar">
+                                        {{ user.first_name|first|default:user.mobile|first }}
+                                    </span>
+
+                                    <span class="contact-details">
+
+                                        <strong>
+                                            {{ user.first_name }}
+                                            {{ user.last_name }}
+                                        </strong>
+
+                                        <small>
+                                            {{ user.mobile }}
+                                        </small>
+
+                                    </span>
+
+                                    <span class="contact-check">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    </span>
+
+                                </label>
+
+                            {% empty %}
+
+                                <div class="picker-empty">
+                                    کاربری برای انتخاب وجود ندارد.
+                                </div>
 
                             {% endfor %}
 
-                        </select>
+                            <div class="picker-empty d-none"
+                                 id="privateContactEmpty">
+                                مخاطبی پیدا نشد.
+                            </div>
+
+                        </div>
 
                         <div class="alert alert-danger d-none mt-3"
                              id="privateChatError">
@@ -367,6 +424,7 @@
                         <button type="submit"
                                 class="btn btn-primary"
                                 id="privateChatSubmit">
+                            <i class="bi bi-chat-dots me-1"></i>
                             رفتن به گفتگو
                         </button>
 
@@ -386,33 +444,46 @@
          tabindex="-1"
          aria-hidden="true">
 
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
 
-            <div class="modal-content">
+            <div class="modal-content chat-modal">
 
                 <form id="groupChatForm">
 
                     {% csrf_token %}
 
-                    <div class="modal-header">
-
-                        <h5 class="modal-title">
-                            ایجاد گروه جدید
-                        </h5>
-
+                    <div class="modal-header group-members-header">
+                    
+                        <div class="group-members-title">
+                    
+                            <span class="group-members-icon">
+                                <i class="bi bi-people-fill"></i>
+                            </span>
+                    
+                            <div>
+                                <h5 class="modal-title">ایجاد گروه جدید</h5>
+                                <small>نام گروه و اعضای آن را مشخص کنید</small>
+                            </div>
+                    
+                        </div>
+                    
                         <button type="button"
-                                class="btn-close ms-0"
+                                class="group-modal-close"
                                 data-bs-dismiss="modal"
                                 aria-label="بستن">
+                    
+                            <i class="bi bi-x-lg"></i>
+                    
                         </button>
-
+                    
                     </div>
 
                     <div class="modal-body">
 
-                        <div class="mb-3">
+                        <div class="group-title-field">
 
                             <label for="groupTitle" class="form-label">
+                                <i class="bi bi-chat-square-text me-1"></i>
                                 نام گروه
                             </label>
 
@@ -426,40 +497,74 @@
 
                         </div>
 
-                        <div class="mb-3">
+                        <div class="picker-heading">
 
-                            <label for="groupMembers" class="form-label">
-                                اعضای گروه
-                            </label>
+                            <span>انتخاب اعضا</span>
 
-                            <select class="form-select"
-                                    id="groupMembers"
-                                    name="members"
-                                    multiple
-                                    size="6">
+                            <span class="selected-counter"
+                                  id="groupSelectedCount">
+                                ۰ نفر انتخاب شده
+                            </span>
 
-                                {% for user in users %}
+                        </div>
 
-                                    {% if user.pk != request.user.pk %}
+                        <div class="contact-search">
+                            <i class="bi bi-search"></i>
 
-                                        <option value="{{ user.pk }}">
-                                            {{ user.first_name }} {{ user.last_name }} — {{ user.mobile }}
-                                        </option>
+                            <input type="text"
+                                   id="groupMemberSearch"
+                                   placeholder="جستجوی نام یا شماره موبایل..."
+                                   autocomplete="off">
+                        </div>
 
-                                    {% endif %}
+                        <div class="contact-picker" id="groupMemberList">
 
-                                {% endfor %}
+                            {% for user in users %}
 
-                            </select>
+                                {% if user.pk != request.user.pk %}
 
-                            <div class="form-text">
-                                برای انتخاب چند عضو، کلید Ctrl را نگه دارید.
-                                سازنده گروه به‌صورت خودکار عضو می‌شود.
+                                    <label class="contact-option"
+                                           data-search="{{ user.first_name }} {{ user.last_name }} {{ user.mobile }}">
+
+                                        <input type="checkbox"
+                                               name="members"
+                                               value="{{ user.pk }}">
+
+                                        <span class="contact-avatar">
+                                            {{ user.first_name|first|default:user.mobile|first }}
+                                        </span>
+
+                                        <span class="contact-details">
+
+                                            <strong>
+                                                {{ user.first_name }}
+                                                {{ user.last_name }}
+                                            </strong>
+
+                                            <small>
+                                                {{ user.mobile }}
+                                            </small>
+
+                                        </span>
+
+                                        <span class="contact-check">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </span>
+
+                                    </label>
+
+                                {% endif %}
+
+                            {% endfor %}
+
+                            <div class="picker-empty d-none"
+                                 id="groupMemberEmpty">
+                                کاربری پیدا نشد.
                             </div>
 
                         </div>
 
-                        <div class="alert alert-danger d-none"
+                        <div class="alert alert-danger d-none mt-3"
                              id="groupChatError">
                         </div>
 
@@ -476,6 +581,7 @@
                         <button type="submit"
                                 class="btn btn-primary"
                                 id="groupChatSubmit">
+                            <i class="bi bi-people me-1"></i>
                             ایجاد گروه
                         </button>
 
@@ -488,6 +594,7 @@
         </div>
 
     </div>
+
 
 </div>
 
@@ -502,21 +609,28 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    <i class="bi bi-people me-2"></i>
-                    اعضای گروه
-                </h5>
-
+            <div class="modal-header group-members-header">
+            
+                <div class="group-members-title">
+                    <span class="group-members-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </span>
+            
+                    <div>
+                        <h5 class="modal-title">اعضای گروه</h5>
+                        <small>فهرست اعضای این گفتگو</small>
+                    </div>
+                </div>
+            
                 <button type="button"
-                        class="btn-close ms-0"
+                        class="group-modal-close"
                         data-bs-dismiss="modal"
                         aria-label="بستن">
+                    <i class="bi bi-x-lg"></i>
                 </button>
-
+            
             </div>
-
+        
             <div class="modal-body">
 
                 <div class="group-members-list">
