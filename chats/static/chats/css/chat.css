@@ -1,3 +1,38 @@
+/* Vazirmatn Font */
+
+@font-face {
+    font-family: "Vazirmatn";
+    src: url("../fonts/Vazirmatn-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Vazirmatn";
+    src: url("../fonts/Vazirmatn-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Vazirmatn";
+    src: url("../fonts/Vazirmatn-SemiBold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Vazirmatn";
+    src: url("../fonts/Vazirmatn-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Global Styles */
 
 * {
     box-sizing: border-box;
@@ -9,9 +44,19 @@ body {
     height: 100%;
     margin: 0;
     overflow: hidden;
-    font-family: Tahoma, Arial, sans-serif;
+    font-family: "Vazirmatn", sans-serif;
     background: #f7f8fc;
     color: #202533;
+}
+
+/* Apply font to all elements */
+
+button,
+input,
+textarea,
+select,
+option {
+    font-family: inherit;
 }
 
 /* Chat App */
