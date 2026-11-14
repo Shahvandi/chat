@@ -163,29 +163,38 @@
 
         </div>
 
-        <!-- Sidebar Account -->
-        <div class="sidebar-account">
+    <!-- Sidebar Account -->
+    <div class="sidebar-account">
 
-            <div class="sidebar-account-avatar">
-                {{ request.user.first_name|first|default:"ک" }}
-            </div>
+{#        <div class="sidebar-account-avatar">#}
+{#            {{ request.user.first_name|first|default:"ک" }}#}
+{#        </div>#}
 
-            <div class="sidebar-account-info">
+        <button class="sidebar-action-btn settings-btn"
+                type="button"
+                id="settingsBtn"
+                title="تنظیمات"
+                aria-label="تنظیمات">
 
-                <strong> مشاهده پروفایل</strong>
+            <i class="bi bi-gear-fill"></i>
 
-            </div>
-        
-            <a href="{% url 'accounts:profile' %}"
-               class="sidebar-profile-btn"
-               title="مشاهده پروفایل"
-               aria-label="مشاهده پروفایل">
+        </button>
 
-                <i class="bi bi-person-gear"></i>
-
-            </a>
-
+        <div class="sidebar-account-info">
+            <strong>حساب کاربری من</strong>
         </div>
+
+        <a href="{% url 'accounts:logout' %}"
+           class="sidebar-action-btn logout-btn"
+           title="خروج از حساب کاربری"
+           aria-label="خروج از حساب کاربری">
+
+            <i class="bi bi-box-arrow-left"></i>
+
+        </a>
+    </div>
+
+
     </aside>
 
     <!-- Main Chat -->
@@ -294,29 +303,39 @@
         </section>
 
         <!-- Message Input -->
-        <footer class="message-footer">
+<!-- Message Input -->
+<footer class="message-footer">
 
-            {% csrf_token %}
+    {% csrf_token %}
 
-            <button class="icon-btn" type="button" aria-label="پیوست">
-                <i class="bi bi-paperclip"></i>
-            </button>
+    <div class="message-input-wrap">
 
-            <input type="text"
-                   id="messageInput"
-                   placeholder="پیام خود را بنویسید..."
-                   autocomplete="off">
+        <input type="text"
+               id="messageInput"
+               placeholder="پیام خود را بنویسید..."
+               autocomplete="off">
 
-            <button class="send-btn"
-                    id="sendBtn"
-                    type="button"
-                    aria-label="ارسال پیام">
+        <button class="attachment-btn"
+                type="button"
+                aria-label="پیوست"
+                title="افزودن پیوست">
 
-                <i class="bi bi-send-fill"></i>
+            <i class="bi bi-paperclip"></i>
 
-            </button>
+        </button>
 
-        </footer>
+    </div>
+
+    <button class="send-btn"
+            id="sendBtn"
+            type="button"
+            aria-label="ارسال پیام">
+
+        <i class="bi bi-send-fill"></i>
+
+    </button>
+
+</footer>
 
     </main>
 
