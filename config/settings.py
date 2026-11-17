@@ -233,16 +233,39 @@ DEFAULT_FROM_EMAIL = config(
     default=EMAIL_HOST_USER
 )
 
-
 # ==========================================
-# CHANNELS
+# CHANNEL LAYERS
 # ==========================================
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
+if DEBUG:
+
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        },
+    }
+
+else:
+
+    REDIS_HOST = config('REDIS_HOST')
+    REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
+    REDIS_USERNAME = config('REDIS_USERNAME', default='default')
+    REDIS_PASSWORD = config('REDIS_PASSWORD')
+
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [{
+                    'address': (
+                        f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
+                    ),
+                    'username': REDIS_USERNAME,
+                    'password': REDIS_PASSWORD,
+                }],
+            },
+        },
+    }
 
 
 # ==========================================
