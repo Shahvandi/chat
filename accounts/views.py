@@ -42,7 +42,7 @@ class Sign(View):
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
             messages.warning(self.request, f'{self.request.user} signed in!')
-            return redirect('accounts:index')
+            return redirect('chats:home')
         return render(self.request, 'accounts/sign.html')
 
 

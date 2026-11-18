@@ -51,4 +51,4 @@ htmlcov/
 Thumbs.db
 desktop.ini
 /node_modules/
-
+/public/

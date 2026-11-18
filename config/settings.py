@@ -126,7 +126,7 @@ if DB_ENGINE == 'django.db.backends.sqlite3':
             'ENGINE': DB_ENGINE,
             'NAME': config(
                 'DB_NAME',
-                default=BASE_DIR / 'db.sqlite3'
+                default=BASE_DIR / 'database/db.sqlite3'
             ),
         }
     }
@@ -233,6 +233,7 @@ DEFAULT_FROM_EMAIL = config(
     default=EMAIL_HOST_USER
 )
 
+
 # ==========================================
 # CHANNEL LAYERS
 # ==========================================
@@ -247,25 +248,37 @@ if DEBUG:
 
 else:
 
-    REDIS_HOST = config('REDIS_HOST')
+    REDIS_HOST = config("REDIS_HOST", '127.0.0.1')
     REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
     REDIS_USERNAME = config('REDIS_USERNAME', default='default')
-    REDIS_PASSWORD = config('REDIS_PASSWORD')
+    REDIS_PASSWORD = config('REDIS_PASSWORD', default=None)
 
-    CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-                'hosts': [{
-                    'address': (
-                        f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
-                    ),
-                    'username': REDIS_USERNAME,
-                    'password': REDIS_PASSWORD,
-                }],
+    if REDIS_PASSWORD:
+
+        CHANNEL_LAYERS = {
+            'default': {
+                'BACKEND': 'channels_redis.core.RedisChannelLayer',
+                'CONFIG': {
+                    'hosts': [{
+                        'address': (
+                            f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
+                        ),
+                        'username': REDIS_USERNAME,
+                        'password': REDIS_PASSWORD,
+                    }],
+                },
             },
-        },
-    }
+        }
+
+    else:
+        CHANNEL_LAYERS = {
+            "default": {
+                "BACKEND": "channels_redis.core.RedisChannelLayer",
+                "CONFIG": {
+                    "hosts": [f'redis://{REDIS_HOST}:{REDIS_PORT}/0']
+                },
+            },
+        }
 
 
 # ==========================================
