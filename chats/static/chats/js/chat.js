@@ -34,8 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .map(element => element.dataset.groupMemberId)
     );
 
-    // کاربران آنلاین
+    // کاربران آنلاین و نسخه آخرین رویداد هر کاربر
     const onlineUserIds = new Set();
+    const presenceVersions = new Map();
 
     if (headerStatus) {
         headerStatus.hidden = isSelfChat || (!isPrivateChat && !isGroupChat);
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let presenceSocket = null;
     let reconnectTimer = null;
+    let heartbeatTimer = null;
 
 
     function updateGroupOnlineCount() {
@@ -64,7 +66,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    function updatePresence(userId, isOnline) {
+    function updatePresence(userId, isOnline, version = 0) {
+
+        userId = String(userId);
+
+        // جلوگیری از اعمال رویداد قدیمی که دیرتر به مرورگر رسیده است.
+        const incomingVersion = Number(version) || 0;
+        const currentVersion = presenceVersions.get(userId) || 0;
+
+        if (incomingVersion < currentVersion) {
+            return;
+        }
+
+        presenceVersions.set(userId, incomingVersion);
 
         // به‌روزرسانی وضعیت کاربران در Sidebar
         document.querySelectorAll("[data-presence-user-id]")
@@ -143,6 +157,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 clearTimeout(reconnectTimer);
                 reconnectTimer = null;
             }
+
+            // Heartbeat هر ۱۵ ثانیه؛ هر تب اتصال مستقل خودش را تمدید می‌کند.
+            const sendHeartbeat = () => {
+                if (presenceSocket?.readyState === WebSocket.OPEN) {
+                    presenceSocket.send(JSON.stringify({
+                        type: "heartbeat"
+                    }));
+                }
+            };
+
+            sendHeartbeat();
+
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+            }
+
+            heartbeatTimer = setInterval(sendHeartbeat, 15000);
         };
 
         presenceSocket.onmessage = event => {
@@ -164,9 +195,24 @@ document.addEventListener("DOMContentLoaded", () => {
                         dot.classList.remove("is-online");
                     });
 
+                document.querySelectorAll("[data-presence-label-user-id]")
+                    .forEach(label => {
+                        label.textContent = "آفلاین";
+                        label.classList.remove("is-online");
+                    });
+
                 data.users.forEach(user => {
-                    updatePresence(user.user_id, true);
+                    updatePresence(
+                        user.user_id,
+                        true,
+                        user.version
+                    );
                 });
+
+                // محاسبه مجدد تعداد اعضای آنلاین گروه
+                if (isGroupChat) {
+                    updateGroupOnlineCount();
+                }
 
                 // وضعیت اولیه چت خصوصی
                 if (isPrivateChat && !isSelfChat && headerStatus) {
@@ -188,7 +234,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 updatePresence(
                     data.user_id,
-                    data.is_online
+                    data.is_online,
+                    data.version
                 );
             }
         };
@@ -198,6 +245,11 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         presenceSocket.onclose = () => {
+
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
 
             if (headerStatus && !isSelfChat) {
                 headerStatus.textContent = "اتصال قطع شد";

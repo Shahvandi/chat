@@ -235,11 +235,27 @@ DEFAULT_FROM_EMAIL = config(
 
 
 # ==========================================
+# REDIS CONFIGURATION (shared by all workers)
+# ==========================================
+
+REDIS_HOST = config('REDIS_HOST', default='127.0.0.1')
+REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
+REDIS_USERNAME = config('REDIS_USERNAME', default='default')
+REDIS_PASSWORD = config('REDIS_PASSWORD', default=None)
+REDIS_DB = config('REDIS_DB', default=0, cast=int)
+
+PRESENCE_REDIS_PREFIX = config(
+    'PRESENCE_REDIS_PREFIX',
+    default='chat:presence:v1'
+)
+
+
+# ==========================================
 # CHANNEL LAYERS
 # ==========================================
 
 if DEBUG:
-
+    # Local development: no Redis required
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels.layers.InMemoryChannelLayer',
@@ -247,40 +263,25 @@ if DEBUG:
     }
 
 else:
-
-    REDIS_HOST = config("REDIS_HOST", '127.0.0.1')
-    REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
-    REDIS_USERNAME = config('REDIS_USERNAME', default='default')
-    REDIS_PASSWORD = config('REDIS_PASSWORD', default=None)
+    # Production: shared Redis for all workers
+    redis_channel_config = {
+        'address': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
+        'socket_timeout': None,
+        'socket_connect_timeout': 10,
+    }
 
     if REDIS_PASSWORD:
+        redis_channel_config['username'] = REDIS_USERNAME or 'default'
+        redis_channel_config['password'] = REDIS_PASSWORD
 
-        CHANNEL_LAYERS = {
-            'default': {
-                'BACKEND': 'channels_redis.core.RedisChannelLayer',
-                'CONFIG': {
-                    'hosts': [{
-                        'address': (
-                            f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
-                        ),
-                        'username': REDIS_USERNAME,
-                        'password': REDIS_PASSWORD,
-                        "socket_timeout": None,
-                        "socket_connect_timeout": 10,
-                    }],
-                },
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [redis_channel_config],
             },
-        }
-
-    else:
-        CHANNEL_LAYERS = {
-            "default": {
-                "BACKEND": "channels_redis.core.RedisChannelLayer",
-                "CONFIG": {
-                    "hosts": [f'redis://{REDIS_HOST}:{REDIS_PORT}/0']
-                },
-            },
-        }
+        },
+    }
 
 
 # ==========================================
