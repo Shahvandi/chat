@@ -185,6 +185,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            if (data.type === "chat.conversation") {
+                handleIncomingConversation(data.conversation);
+                return;
+            }
+
             // دریافت لیست اولیه کاربران آنلاین
             if (data.type === "presence.snapshot") {
 
@@ -367,6 +372,116 @@ document.addEventListener("DOMContentLoaded", () => {
         initializeMessageScroll();
     }
 
+    // افزودن گفتگو به Sidebar؛ برای گفتگوهایی که بعد از بارگذاری صفحه ساخته می‌شوند.
+    function upsertConversation(conversation, previewText = "هنوز پیامی ارسال نشده است.") {
+
+        if (!conversation?.id || !conversation?.url) return null;
+
+        const chatList = document.getElementById("chatList");
+        if (!chatList) return null;
+
+        let item = Array.from(chatList.querySelectorAll(".chat-item"))
+            .find(element => element.dataset.conversationId === String(conversation.id));
+
+        const title = conversation.display_title || conversation.title || "گفتگوی جدید";
+
+        if (!item) {
+            chatList.querySelector(":scope > p")?.remove();
+
+            item = document.createElement("a");
+            item.href = conversation.url;
+            item.className = "chat-item";
+            item.style.textDecoration = "none";
+            item.style.color = "inherit";
+            item.dataset.conversationId = String(conversation.id);
+            item.dataset.name = title;
+
+            const avatar = document.createElement("div");
+            avatar.className = "avatar";
+            avatar.textContent = title.charAt(0) || "گ";
+
+            const info = document.createElement("div");
+            info.className = "chat-info";
+
+            const top = document.createElement("div");
+            top.className = "chat-top";
+            const name = document.createElement("strong");
+            name.textContent = title;
+            const time = document.createElement("small");
+            time.textContent = new Intl.DateTimeFormat("fa-IR", {
+                hour: "2-digit", minute: "2-digit"
+            }).format(new Date());
+            top.append(name, time);
+
+            const bottom = document.createElement("div");
+            bottom.className = "chat-bottom";
+            const preview = document.createElement("span");
+            preview.textContent = previewText;
+            bottom.appendChild(preview);
+
+            info.append(top, bottom);
+            item.append(avatar, info);
+            chatList.prepend(item);
+        } else {
+            // عنوان گفتگوی موجود را تغییر نده؛ در چت خصوصی نام مخاطب برای
+            // فرستنده و گیرنده متفاوت است.
+            if (item.parentElement) item.parentElement.prepend(item);
+        }
+
+        const preview = item.querySelector(".chat-bottom span");
+        if (preview && previewText) preview.textContent = previewText;
+
+        return item;
+    }
+
+    // دریافت اعلان ایجاد گروه برای همه اعضا
+    function handleIncomingConversation(conversation) {
+
+        if (!conversation) return;
+
+        const item = upsertConversation(
+            conversation,
+            `گروه توسط ${conversation.created_by_name || "یکی از اعضا"} ایجاد شد.`
+        );
+
+        if (!item) return;
+
+        if (String(conversation.id) !== String(conversationId)) {
+            showConversationToast(conversation);
+        }
+    }
+
+    function showConversationToast(conversation) {
+
+        if (!window.bootstrap?.Toast) return;
+
+        let container = document.getElementById("messageToastContainer");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "messageToastContainer";
+            container.className = "toast-container position-fixed bottom-0 start-0 p-3";
+            container.style.zIndex = "1080";
+            document.body.appendChild(container);
+        }
+
+        const toastElement = document.createElement("div");
+        toastElement.className = "toast";
+        toastElement.setAttribute("role", "status");
+        const body = document.createElement("div");
+        body.className = "toast-body";
+        body.style.cursor = "pointer";
+        body.textContent = `گروه «${conversation.display_title || conversation.title}» ایجاد شد و شما عضو آن هستید.`;
+        body.addEventListener("click", () => {
+            window.location.href = conversation.url;
+        });
+        toastElement.appendChild(body);
+        container.appendChild(toastElement);
+
+        const toast = new bootstrap.Toast(toastElement, {delay: 6000});
+        toast.show();
+        toastElement.addEventListener("hidden.bs.toast", () => toastElement.remove());
+    }
+
     // به‌روزرسانی پیش‌نمایش گفتگو در Sidebar
     function updateConversationPreview(data) {
 
@@ -515,6 +630,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleIncomingChatMessage(data) {
 
         if (!data) return;
+
+        // ابتدا گفتگو را در Sidebar بساز (برای اولین پیام چت خصوصی جدید).
+        if (data.conversation) {
+            upsertConversation(data.conversation, data.content || "");
+        }
 
         // به‌روزرسانی Sidebar
         updateConversationPreview(data);

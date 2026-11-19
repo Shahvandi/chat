@@ -208,3 +208,9 @@ class PresenceConsumer(AsyncJsonWebsocketConsumer):
             "type": "chat.message",
             "message": event["message"],
         })
+
+    async def chat_conversation(self, event):
+        await self.send_json({
+            'type': 'chat.conversation',
+            'conversation': event['conversation'],
+        })
