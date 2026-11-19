@@ -265,6 +265,8 @@ else:
                         ),
                         'username': REDIS_USERNAME,
                         'password': REDIS_PASSWORD,
+                        "socket_timeout": None,
+                        "socket_connect_timeout": 10,
                     }],
                 },
             },
