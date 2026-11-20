@@ -39,6 +39,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.mobile
 
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
 
 class Otp(models.Model):
     """
