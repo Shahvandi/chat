@@ -346,8 +346,8 @@ document.addEventListener("DOMContentLoaded", () => {
             message.dataset.messageId = String(data.id);
         }
 
-        // نام فرستنده در پیام‌های دریافتی
-        if (!isMine && data.sender_name) {
+        // نام فرستنده فقط در پیام‌های دریافتی گروهی
+        if (isGroupChat && !isMine && data.sender_name) {
 
             const sender = document.createElement("div");
 
