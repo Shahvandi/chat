@@ -688,12 +688,15 @@ option {
 }
 
 .group-title-field {
-    margin-bottom: 23px;
+    margin-bottom: 10px;
 }
 
 .group-title-field .form-label {
-    display: block;
-    margin-bottom: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 5px;
     color: #303747;
     font-size: 12px;
     font-weight: 700;
@@ -1051,4 +1054,37 @@ option {
     .contact-picker {
         max-height: 260px;
     }
+}
+
+/* Unread message counter */
+.unread-badge {
+    display: inline-flex;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 6px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #6658e8;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    flex: 0 0 auto;
+    overflow: visible !important;
+    white-space: nowrap !important;
+}
+
+.message-status {
+    margin-inline-start: 5px;
+    color: #a0a5b1;
+    transition: color .2s ease;
+}
+
+.message-status.is-delivered {
+    color: #a0a5b1;
+}
+
+.message-status.is-read {
+    color: #28a7e8;
 }

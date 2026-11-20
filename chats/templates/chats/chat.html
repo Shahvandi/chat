@@ -163,37 +163,36 @@
 
         </div>
 
-    <!-- Sidebar Account -->
-    <div class="sidebar-account">
+        <!-- Sidebar Account -->
+        <div class="sidebar-account">
 
-{#        <div class="sidebar-account-avatar">#}
-{#            {{ request.user.first_name|first|default:"ک" }}#}
-{#        </div>#}
+            {#        <div class="sidebar-account-avatar">#}
+            {#            {{ request.user.first_name|first|default:"ک" }}#}
+            {#        </div>#}
 
-        <button class="sidebar-action-btn settings-btn"
-                type="button"
-                id="settingsBtn"
-                title="تنظیمات"
-                aria-label="تنظیمات">
+            <button class="sidebar-action-btn settings-btn"
+                    type="button"
+                    id="settingsBtn"
+                    title="تنظیمات"
+                    aria-label="تنظیمات">
 
-            <i class="bi bi-gear-fill"></i>
+                <i class="bi bi-gear-fill"></i>
 
-        </button>
+            </button>
 
-        <div class="sidebar-account-info">
-            <strong>حساب کاربری من</strong>
+            <div class="sidebar-account-info">
+                <strong>حساب کاربری من</strong>
+            </div>
+
+            <a href="{% url 'accounts:logout' %}"
+               class="sidebar-action-btn logout-btn"
+               title="خروج از حساب کاربری"
+               aria-label="خروج از حساب کاربری">
+
+                <i class="bi bi-box-arrow-left"></i>
+
+            </a>
         </div>
-
-        <a href="{% url 'accounts:logout' %}"
-           class="sidebar-action-btn logout-btn"
-           title="خروج از حساب کاربری"
-           aria-label="خروج از حساب کاربری">
-
-            <i class="bi bi-box-arrow-left"></i>
-
-        </a>
-    </div>
-
 
     </aside>
 
@@ -303,42 +302,40 @@
         </section>
 
         <!-- Message Input -->
-<!-- Message Input -->
-<footer class="message-footer">
+        <footer class="message-footer">
 
-    {% csrf_token %}
+            {% csrf_token %}
 
-    <div class="message-input-wrap">
+            <div class="message-input-wrap">
 
-        <input type="text"
-               id="messageInput"
-               placeholder="پیام خود را بنویسید..."
-               autocomplete="off">
+                <input type="text"
+                       id="messageInput"
+                       placeholder="پیام خود را بنویسید..."
+                       autocomplete="off">
 
-        <button class="attachment-btn"
-                type="button"
-                aria-label="پیوست"
-                title="افزودن پیوست">
+                <button class="attachment-btn"
+                        type="button"
+                        aria-label="پیوست"
+                        title="افزودن پیوست">
 
-            <i class="bi bi-paperclip"></i>
+                    <i class="bi bi-paperclip"></i>
 
-        </button>
+                </button>
 
-    </div>
+            </div>
 
-    <button class="send-btn"
-            id="sendBtn"
-            type="button"
-            aria-label="ارسال پیام">
+            <button class="send-btn"
+                    id="sendBtn"
+                    type="button"
+                    aria-label="ارسال پیام">
 
-        <i class="bi bi-send-fill"></i>
+                <i class="bi bi-send-fill"></i>
 
-    </button>
+            </button>
 
-</footer>
+        </footer>
 
     </main>
-
 
     <!-- Private Chat Modal -->
     <div class="modal fade"
@@ -346,7 +343,7 @@
          tabindex="-1"
          aria-hidden="true">
 
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered">
 
             <div class="modal-content chat-modal">
 
@@ -354,48 +351,57 @@
 
                     {% csrf_token %}
 
+                    <!-- Header -->
                     <div class="modal-header group-members-header">
-                    
+
                         <div class="group-members-title">
-                    
-                            <span class="group-members-icon">
-                                <i class="bi bi-person-plus-fill"></i>
-                            </span>
-                    
+    
+                                <span class="group-members-icon">
+                                    <i class="bi bi-person-plus-fill"></i>
+                                </span>
+
                             <div>
                                 <h5 class="modal-title">چت خصوصی</h5>
                                 <small>مخاطب موردنظر را انتخاب کنید</small>
                             </div>
-                    
+
                         </div>
-                    
+
                         <button type="button"
                                 class="group-modal-close"
                                 data-bs-dismiss="modal"
                                 aria-label="بستن">
-                    
+
                             <i class="bi bi-x-lg"></i>
-                    
+
                         </button>
-                    
+
                     </div>
 
+                    <!-- Body -->
                     <div class="modal-body">
 
+                        <!-- Search -->
                         <div class="contact-search">
+
                             <i class="bi bi-search"></i>
 
                             <input type="text"
                                    id="privateContactSearch"
                                    placeholder="جستجوی نام یا شماره موبایل..."
                                    autocomplete="off">
+
                         </div>
 
+                        <!-- Contact List -->
                         <div class="picker-heading">
+
                             <span>مخاطبان</span>
+
                             <small id="privateContactCount">
                                 {{ users|length }} کاربر
                             </small>
+
                         </div>
 
                         <div class="contact-picker"
@@ -412,25 +418,25 @@
                                            required>
 
                                     <span class="contact-avatar">
-                                        {{ user.first_name|first|default:user.mobile|first }}
-                                    </span>
+                                            {{ user.first_name|first|default:user.mobile|first }}
+                                        </span>
 
                                     <span class="contact-details">
-
-                                        <strong>
-                                            {{ user.first_name }}
-                                            {{ user.last_name }}
-                                        </strong>
-
-                                        <small>
-                                            {{ user.mobile }}
-                                        </small>
-
-                                    </span>
+    
+                                            <strong>
+                                                {{ user.first_name }}
+                                                {{ user.last_name }}
+                                            </strong>
+    
+                                            <small>
+                                                {{ user.mobile }}
+                                            </small>
+    
+                                        </span>
 
                                     <span class="contact-check">
-                                        <i class="bi bi-check-circle-fill"></i>
-                                    </span>
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </span>
 
                                 </label>
 
@@ -449,12 +455,14 @@
 
                         </div>
 
+                        <!-- Error -->
                         <div class="alert alert-danger d-none mt-3"
                              id="privateChatError">
                         </div>
 
                     </div>
 
+                    <!-- Footer -->
                     <div class="modal-footer">
 
                         <button type="button"
@@ -466,8 +474,10 @@
                         <button type="submit"
                                 class="btn btn-primary"
                                 id="privateChatSubmit">
+
                             <i class="bi bi-chat-dots me-1"></i>
                             رفتن به گفتگو
+
                         </button>
 
                     </div>
@@ -486,7 +496,7 @@
          tabindex="-1"
          aria-hidden="true">
 
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered">
 
             <div class="modal-content chat-modal">
 
@@ -494,39 +504,52 @@
 
                     {% csrf_token %}
 
+                    <!-- Header -->
                     <div class="modal-header group-members-header">
-                    
+
                         <div class="group-members-title">
-                    
-                            <span class="group-members-icon">
-                                <i class="bi bi-people-fill"></i>
-                            </span>
-                    
+    
+                                <span class="group-members-icon">
+                                    <i class="bi bi-people-fill"></i>
+                                </span>
+
                             <div>
                                 <h5 class="modal-title">ایجاد گروه جدید</h5>
                                 <small>نام گروه و اعضای آن را مشخص کنید</small>
                             </div>
-                    
+
                         </div>
-                    
+
                         <button type="button"
                                 class="group-modal-close"
                                 data-bs-dismiss="modal"
                                 aria-label="بستن">
-                    
+
                             <i class="bi bi-x-lg"></i>
-                    
+
                         </button>
-                    
+
                     </div>
 
+                    <!-- Body -->
                     <div class="modal-body">
 
+                        <!-- Group Title -->
                         <div class="group-title-field">
 
-                            <label for="groupTitle" class="form-label">
-                                <i class="bi bi-chat-square-text me-1"></i>
-                                نام گروه
+                            <label for="groupTitle"
+                                   class="form-label group-title-label-row">
+    
+                                    <span>
+                                        <i class="bi bi-chat-square-text me-1"></i>
+                                        نام گروه
+                                    </span>
+
+                                <span class="selected-counter"
+                                      id="groupSelectedCount">
+                                        ۰ نفر انتخاب شده
+                                    </span>
+
                             </label>
 
                             <input type="text"
@@ -539,27 +562,21 @@
 
                         </div>
 
-                        <div class="picker-heading">
-
-                            <span>انتخاب اعضا</span>
-
-                            <span class="selected-counter"
-                                  id="groupSelectedCount">
-                                ۰ نفر انتخاب شده
-                            </span>
-
-                        </div>
-
+                        <!-- Search -->
                         <div class="contact-search">
+
                             <i class="bi bi-search"></i>
 
                             <input type="text"
                                    id="groupMemberSearch"
                                    placeholder="جستجوی نام یا شماره موبایل..."
                                    autocomplete="off">
+
                         </div>
 
-                        <div class="contact-picker" id="groupMemberList">
+                        <!-- Contact List -->
+                        <div class="contact-picker"
+                             id="groupMemberList">
 
                             {% for user in users %}
 
@@ -573,25 +590,25 @@
                                                value="{{ user.pk }}">
 
                                         <span class="contact-avatar">
-                                            {{ user.first_name|first|default:user.mobile|first }}
-                                        </span>
+                                                {{ user.first_name|first|default:user.mobile|first }}
+                                            </span>
 
                                         <span class="contact-details">
-
-                                            <strong>
-                                                {{ user.first_name }}
-                                                {{ user.last_name }}
-                                            </strong>
-
-                                            <small>
-                                                {{ user.mobile }}
-                                            </small>
-
-                                        </span>
+    
+                                                <strong>
+                                                    {{ user.first_name }}
+                                                    {{ user.last_name }}
+                                                </strong>
+    
+                                                <small>
+                                                    {{ user.mobile }}
+                                                </small>
+    
+                                            </span>
 
                                         <span class="contact-check">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                        </span>
+                                                <i class="bi bi-check-circle-fill"></i>
+                                            </span>
 
                                     </label>
 
@@ -606,12 +623,14 @@
 
                         </div>
 
+                        <!-- Error -->
                         <div class="alert alert-danger d-none mt-3"
                              id="groupChatError">
                         </div>
 
                     </div>
 
+                    <!-- Footer -->
                     <div class="modal-footer">
 
                         <button type="button"
@@ -623,8 +642,10 @@
                         <button type="submit"
                                 class="btn btn-primary"
                                 id="groupChatSubmit">
+
                             <i class="bi bi-people me-1"></i>
                             ایجاد گروه
+
                         </button>
 
                     </div>
@@ -637,108 +658,107 @@
 
     </div>
 
-
 </div>
 
 {% if selected_conversation.type == 'GROUP' %}
 
-<div class="modal fade"
-     id="groupMembersModal"
-     tabindex="-1"
-     aria-hidden="true">
+    <div class="modal fade"
+         id="groupMembersModal"
+         tabindex="-1"
+         aria-hidden="true">
 
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
 
-        <div class="modal-content">
+            <div class="modal-content">
 
-            <div class="modal-header group-members-header">
-            
-                <div class="group-members-title">
+                <div class="modal-header group-members-header">
+
+                    <div class="group-members-title">
                     <span class="group-members-icon">
                         <i class="bi bi-people-fill"></i>
                     </span>
-            
-                    <div>
-                        <h5 class="modal-title">اعضای گروه</h5>
-                        <small>فهرست اعضای این گفتگو</small>
+
+                        <div>
+                            <h5 class="modal-title">اعضای گروه</h5>
+                            <small>فهرست اعضای این گفتگو</small>
+                        </div>
                     </div>
+
+                    <button type="button"
+                            class="group-modal-close"
+                            data-bs-dismiss="modal"
+                            aria-label="بستن">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+
                 </div>
-            
-                <button type="button"
-                        class="group-modal-close"
-                        data-bs-dismiss="modal"
-                        aria-label="بستن">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            
-            </div>
-        
-            <div class="modal-body">
 
-                <div class="group-members-list">
+                <div class="modal-body">
 
-                    {% for member in selected_conversation.members.all %}
+                    <div class="group-members-list">
 
-                        <div class="group-member-item">
+                        {% for member in selected_conversation.members.all %}
 
-                            <div class="avatar group-member-avatar">
-                                {{ member.user.first_name|first|default:"ک" }}
-                            </div>
+                            <div class="group-member-item">
 
-                            <div class="group-member-info">
+                                <div class="avatar group-member-avatar">
+                                    {{ member.user.first_name|first|default:"ک" }}
+                                </div>
 
-                                <strong>
-                                    {{ member.user.first_name }}
-                                    {{ member.user.last_name }}
+                                <div class="group-member-info">
 
-                                    {% if member.user_id == request.user.pk %}
-                                        <small>(شما)</small>
-                                    {% endif %}
-                                </strong>
+                                    <strong>
+                                        {{ member.user.first_name }}
+                                        {{ member.user.last_name }}
 
-                                <small>
-                                    {{ member.user.mobile }}
-                                </small>
+                                        {% if member.user_id == request.user.pk %}
+                                            <small>(شما)</small>
+                                        {% endif %}
+                                    </strong>
 
-                            </div>
+                                    <small>
+                                        {{ member.user.mobile }}
+                                    </small>
 
-                            <div class="group-member-presence">
+                                </div>
+
+                                <div class="group-member-presence">
 
                                 <span
-                                    class="presence-dot"
-                                    data-presence-user-id="{{ member.user_id }}"
-                                    data-group-member-id="{{ member.user_id }}">
+                                        class="presence-dot"
+                                        data-presence-user-id="{{ member.user_id }}"
+                                        data-group-member-id="{{ member.user_id }}">
                                 </span>
 
-                                <small data-presence-label-user-id="{{ member.user_id }}">
-                                    آفلاین
-                                </small>
+                                    <small data-presence-label-user-id="{{ member.user_id }}">
+                                        آفلاین
+                                    </small>
+
+                                </div>
 
                             </div>
 
-                        </div>
+                        {% endfor %}
 
-                    {% endfor %}
+                    </div>
 
                 </div>
 
-            </div>
+                <div class="modal-footer">
 
-            <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
+                        بستن
+                    </button>
 
-                <button type="button"
-                        class="btn btn-light"
-                        data-bs-dismiss="modal">
-                    بستن
-                </button>
+                </div>
 
             </div>
 
         </div>
 
     </div>
-
-</div>
 
 {% endif %}
 
@@ -747,7 +767,6 @@
 
 <!-- Chat JavaScript -->
 <script src="{% static 'chats/js/chat.js' %}"></script>
-
 
 </body>
 </html>

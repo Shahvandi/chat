@@ -259,6 +259,33 @@ def create_group_conversation(request):
         for user in selected_users
     ])
 
+    # Notify every group member only after the database transaction commits.
+    member_ids = tuple(
+        ConversationMember.objects.filter(
+            conversation=conversation
+        ).values_list('user_id', flat=True)
+    )
+
+    creator_name = (
+        f'{request.user.first_name} {request.user.last_name}'.strip()
+        or request.user.mobile
+    )
+    conversation_payload = {
+        'id': str(conversation.pk),
+        'type': Conversation.ConversationType.GROUP,
+        'title': conversation.title,
+        'display_title': conversation.title,
+        'url': reverse('chats:conversation', args=[conversation.pk]),
+        'created_by_id': str(request.user.pk),
+        'created_by_name': creator_name,
+    }
+
+    transaction.on_commit(
+        lambda ids=member_ids, payload=conversation_payload:
+            broadcast_conversation_notification(ids, payload),
+        robust=True
+    )
+
     return JsonResponse({
         'success': True,
         'conversation_id': str(conversation.pk),
@@ -267,6 +294,21 @@ def create_group_conversation(request):
             args=[conversation.pk]
         ),
     })
+
+
+def broadcast_conversation_notification(user_ids, conversation_payload):
+    # Notify members through their per-user channel groups.
+    channel_layer = get_channel_layer()
+    if channel_layer is None:
+        return
+
+    event = {
+        'type': 'chat.conversation',
+        'conversation': conversation_payload,
+    }
+
+    for user_id in user_ids:
+        async_to_sync(channel_layer.group_send)(f'user.{user_id}', event)
 
 
 def broadcast_message_notification(user_ids, message_payload):
@@ -335,6 +377,18 @@ def send_message(request, conversation_id):
         'created_at': timezone.localtime(
             message.created_at
         ).strftime('%H:%M'),
+        # The recipient may not have this private chat in their sidebar yet.
+        'conversation': {
+            'id': str(membership.conversation_id),
+            'type': membership.conversation.type,
+            'title': membership.conversation.title,
+            'display_title': (
+                sender_name
+                if membership.conversation.type == Conversation.ConversationType.PRIVATE
+                else membership.conversation.title
+            ),
+            'url': reverse('chats:conversation', args=[membership.conversation_id]),
+        },
     }
 
     # دریافت شناسه تمام اعضای گفتگو
