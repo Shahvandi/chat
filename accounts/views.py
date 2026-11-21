@@ -5,51 +5,20 @@ from django.contrib import messages
 from random import randint
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.views import LoginView
-from django.shortcuts import redirect
 
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
-
-
-def disconnect_user_presence(user):
-
-    if not user.is_authenticated:
-        return
-
-    channel_layer = get_channel_layer()
-
-    async_to_sync(channel_layer.group_send)(
-        f"user.{user.pk}",
-        {
-            "type": "force.disconnect",
-        }
-    )
-
-class CustomLoginView(LoginView):
-    def get_success_url(self):
-        if self.request.user.is_superuser:
-            return '/admin/'
-        return '/'
-
-class CustomLogoutView(View):
-    def get(self, request, *args, **kwargs):
-        disconnect_user_presence(request.user)
-        logout(request)
-        return redirect('/')
 
 class Sign(View):
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
             messages.warning(self.request, f'{self.request.user} signed in!')
-            return redirect('chats:home')
-        return render(self.request, 'accounts/sign.html')
+            return redirect('home:index')
+        return render(self.request, 'home/sign.html')
 
 
 class SignIn(View):
     def post(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect('accounts:index')
+            return redirect('home:index')
         username = self.request.POST.get('signInUser')
         password = self.request.POST.get('signInPassword')
         try:
@@ -65,7 +34,7 @@ class SignIn(View):
             login(self.request, user)
             print(f'User {user} login.')
             messages.success(self.request, f'Wellcome {user.fullname}!')
-            return redirect('accounts:index')
+            return redirect('home:index')
         except:
             messages.warning(self.request, 'Login Error!')
             return redirect(f'{reverse("accounts:sign")}?username={username}')
@@ -74,10 +43,10 @@ class SignIn(View):
 class SendOtp(View):
     def post(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect('accounts:index')
+            return redirect('home:index')
         phone = self.request.POST.get('phone')
         Otp.objects.filter(phone=phone).delete()
-        code = randint(10000, 99999)
+        code = randint(100000, 999999)
         token = get_random_string(length=64)
         Otp.objects.create(token=token, phone=phone, code=code)
         print(phone, code, token[:20])          # todo: send sms
@@ -86,7 +55,7 @@ class SendOtp(View):
 
 
 class CheckOtp(TemplateView):
-    template_name = 'accounts/check_otp.html'
+    template_name = 'home/check_otp.html'
 
     def post(self, *args, **kwargs):
         code = self.request.POST.get('code')
@@ -97,7 +66,7 @@ class CheckOtp(TemplateView):
             login(self.request, user)
             print(f'User {user} login.')
             messages.success(self.request, f'Wellcome {user.fullname}!')
-            return redirect('accounts:index')
+            return redirect('home:index')
         except Otp.DoesNotExist:
             messages.warning(self.request, 'Code Error! Try again.')
             return redirect(f'{reverse("accounts:sign")}?sign_in=True')
@@ -112,7 +81,7 @@ class CheckOtp(TemplateView):
 class SignUp(View):
     def post(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect('accounts:index')
+            return redirect('home:index')
         name = self.request.POST.get('signUpUser')
         phone = self.request.POST.get('signUpPhone')
         email = self.request.POST.get('signUpEmail')
@@ -141,5 +110,5 @@ class SignOut(View):
         else:
             messages.success(self.request, 'Any User is not Signed in!')
         logout(self.request)
-        return redirect('accounts:index')
+        return redirect('home:index')
 

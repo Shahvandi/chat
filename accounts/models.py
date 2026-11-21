@@ -1,57 +1,81 @@
-import uuid
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
-class UserModelManager(BaseUserManager):
-    def create_user(self, mobile, password=None, **extra):
-        if not mobile:
-            raise ValueError("Mobile is required.")
-        user = self.model(mobile=mobile, **extra)
-        if password:
-            user.set_password(password)
-        else:
-            user.set_unusable_password()
+class UserManager(BaseUserManager):
+    def create_user(self, phone=None, email=None, fullname=None, password=None):
+
+        user = self.model()
+        user.phone = phone
+        user.email = email
+        user.fullname = fullname
+        user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, mobile, password=None, **extra):
-        extra.setdefault("is_staff", True)
-        extra.setdefault("is_superuser", True)
-        return self.create_user(mobile, password, **extra)
+    def create_superuser(self, phone, email, fullname, password=None):
+        """
+        Creates and saves a superuser with the given email and password.
+        """
+        user = self.create_user(phone, email, fullname, password=password)
+        user.is_superuser = True
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    mobile      = models.CharField(max_length=20, unique=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    is_active   = models.BooleanField(default=True)
-    is_staff    = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+class User(AbstractBaseUser):
+    phone = models.CharField(max_length=11, null=True, blank=True, unique=True, verbose_name='تلفن همراه')
+    email = models.EmailField(
+        verbose_name='آدرس ایمیل',
+        max_length=255,
+        null=True,
+        blank=True,
+        unique=True,
+    )
+    fullname = models.CharField(max_length=60,  verbose_name='نام و نام خانوادگی')
+    is_active = models.BooleanField(default=True,  verbose_name='فعال')
+    is_admin = models.BooleanField(default=False, verbose_name='ادمین')
 
+    objects = UserManager()
 
-    objects = UserModelManager()
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ['phone', 'fullname']
 
-    USERNAME_FIELD  = "mobile"
-    REQUIRED_FIELDS = []
+    class Meta:
+        verbose_name = 'کاربر'
+        verbose_name_plural = 'کاربران'
 
     def __str__(self):
-        return self.mobile
+        return self.fullname
 
-    def get_full_name(self):
-        return f"{self.first_name} {self.last_name}"
+    def has_perm(self, perm, obj=None):
+        """Does the user have a specific permission?"""
+        # Simplest possible answer: Yes, always
+        return True
+
+    def has_module_perms(self, app_label):
+        """Does the user have permissions to view the app `app_label`?"""
+        # Simplest possible answer: Yes, always
+        return True
+
+    @property
+    def is_staff(self):
+        # "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
 
 
+# SMS verification Model:
 class Otp(models.Model):
-    """
-    Stores one active OTP per mobile. Expiry is checked in the repository
-    using OTP_EXPIRY_SECONDS from settings.
-    """
-    id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    mobile     = models.CharField(max_length=20, unique=True)
-    code       = models.CharField(max_length=6)
-    created_at = models.DateTimeField(auto_now=True)
+    phone = models.CharField(max_length=11)
+    token = models.CharField(max_length=100,unique=True, null=True)
+    code = models.SmallIntegerField()
+    expiration_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"OTP<{self.mobile}>"
+        return self.phone
+
+    class Meta:
+        verbose_name = 'کد'
+        verbose_name_plural = 'کدها'

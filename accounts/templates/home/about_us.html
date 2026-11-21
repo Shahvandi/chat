@@ -1,0 +1,234 @@
+﻿{% extends "home/base.html" %}
+{% load static %}
+{% block title %}‌نت‌زون | صفحه درباره ما{% endblock %}
+{% block content %}
+              <!-- header-->
+              <header class="h-16 sticky top-0 z-10 backdrop-blur-lg bg-base-100/75 shadow-md shadow-neutral/10">
+                <div class="container mx-auto relative z-[1]">
+                  <div class="navbar">
+                    <!-- logo-->
+                    <div class="navbar-start"><a class="link no-underline flex gap-2 items-center text-2xl font-black" href="">شرکت<img src="{% static 'img/logo-black.png' %}" alt="لوگو" width="85"/></a></div>
+                    <!-- menu (desktop & higher)-->
+                    <div class="navbar-center hidden lg:flex">
+                      <ul class="menu menu-horizontal gap-4">
+                        <li><a class="font-bold" href="./about-home.html"> <i class="ti ti-home-2 text-xl text-secondary" aria-hidden="true"></i>صفحه اصلی</a></li>
+                        <li><a class="font-bold" href=""><i class="ti ti-writing text-xl text-secondary" aria-hidden="true"></i>وبلاگ</a></li>
+                        <li><a class="font-bold" href=""> <i class="ti ti-users-group text-xl text-secondary" aria-hidden="true"></i>درباره ما</a></li>
+                        <li><a class="font-bold" href=""> <i class="ti ti-phone text-xl text-secondary" aria-hidden="true"></i>تماس با ما</a></li>
+                      </ul>
+                    </div>
+                    <div class="navbar-end flex gap-2 items-center">
+                      <!-- search-->
+                      <label class="input"><i class="ti ti-search text-lg opacity-50" aria-hidden="true"></i>
+                        <input type="search" required="required" placeholder="جستجو"/>
+                      </label>
+                      <!-- burger (mobile & tablet)-->
+                      <div class="dropdown dropdown-end lg:hidden">
+                        <button class="btn btn-ghost btn-circle m-1" tabindex="0" role="button" aria-label="منو اصلی"><i class="ti ti-menu-2 text-2xl" aria-hidden="true"></i></button>
+                        <ul class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm" tabindex="0">
+                          <li><a href="">صفحه اصلی</a></li>
+                          <li><a href="">وبلاگ</a></li>
+                          <li><a href="">درباره ما</a></li>
+                          <li><a href="">تماس با ما</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </header>
+              <!-- content-->
+              <section class="container max-w-7xl mx-auto py-8 px-4">
+                <!-- banner-->
+                <section class="relative flex gap-6 flex-col justify-center items-center min-h-96">
+                  <div class="tracking-widest font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">About Us</div>
+                  <h1 class="text-5xl md:text-6xl font-extrabold py-4">
+                     درباره ما</h1><span class="w-24 h-1 bg-gradient-to-r from-primary to-secondary rounded-full" aria-hidden="true"></span>
+                  <p class="text-center text-lg md:text-xl max-w-2xl leading-relaxed">تیم ما با خلاقیت و نوآوری به دنبال خلق تجربه‌ای متفاوت برای مشتریان است.</p>
+                </section>
+                <!-- hero-->
+                <section class="hero min-h-[60vh] rounded-xl" style="background-image: url({% static 'img/pages/about-us/office.webp' %});" aria-labelledby="hero-heading">
+                  <div class="hero-overlay bg-opacity-75 rounded-xl"></div>
+                  <div class="hero-content text-center text-neutral-content p-8 md:p-10 lg:p-12 bg-black/20 backdrop-blur-md rounded-xl">
+                    <div class="max-w-2xl space-y-8">
+                      <h1 class="text-5xl/relaxed font-bold" id="hero-heading">داستان ما، اشتیاق شما</h1>
+                      <p class="text-lg/loose font-medium">ما بیش از یک فروشگاه هستیم. ما جامعه‌ای از علاقه‌مندان به کیفیت و نوآوری هستیم که گرد هم آمده‌ایم تا بهترین‌ها را برای شما به ارمغان بیاوریم. سفری که با یک ایده ساده شروع شد، اکنون به مقصدی برای هزاران مشتری راضی تبدیل شده است.</p><a class="btn btn-secondary btn-wide shadow-lg shadow-secondary/50" href="#our-values">
+                         ارزش‌های ما<i class="ti ti-chevron-down text-lg" aria-hidden="true"></i></a>
+                    </div>
+                  </div>
+                </section>
+                <!-- timeline-->
+                <section class="py-20 bg-gradient-to-b from-base-200 to-base-100" aria-labelledby="story-heading">
+                  <div class="container mx-auto space-y-8 px-4 md:px-0">
+                    <div class="text-center space-y-4">
+                      <h2 class="text-4xl font-bold" id="story-heading">سفر ما در گذر زمان</h2>
+                      <p class="text-base-content/75">از یک شروع فروتنانه تا تبدیل شدن به یک نام معتبر در صنعت.</p>
+                    </div>
+                    <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
+                      <li>
+                        <div class="timeline-middle text-2xl"><i class="ti ti-sparkles text-lg text-warning" aria-hidden="true"></i></div>
+                        <div class="timeline-start py-2 md:text-end mb-10">
+                          <time class="font-medium">۱۳۹۵</time>
+                          <div class="text-lg font-bold py-4">تولد یک ایده</div>
+                          <p class="max-w-lg leading-loose">یک جرقه در ذهن بنیان‌گذاران ما برای پر کردن یک شکاف در بازار. فروشگاه ما با هدف ارائه محصولات با کیفیت و دسترسی آسان متولد شد.</p>
+                        </div>
+                        <hr/>
+                      </li>
+                      <li>
+                        <hr/>
+                        <div class="timeline-middle text-2xl"><i class="ti ti-sparkles text-lg text-warning" aria-hidden="true"></i></div>
+                        <div class="timeline-end py-2 mb-10">
+                          <time class="font-medium">۱۳۹۷</time>
+                          <div class="text-lg font-bold py-4">راه‌اندازی وب‌سایت</div>
+                          <p class="max-w-lg leading-loose">اولین نسخه از وب‌سایت ما با مجموعه‌ای محدود از محصولات راه‌اندازی شد. تمرکز ما بر روی تجربه کاربری بی‌نقص بود.</p>
+                        </div>
+                        <hr/>
+                      </li>
+                      <li>
+                        <hr/>
+                        <div class="timeline-middle text-2xl"><i class="ti ti-sparkles text-lg text-warning" aria-hidden="true"></i></div>
+                        <div class="timeline-start py-2 md:text-end mb-10">
+                          <time class="font-medium">۱۴۰۰</time>
+                          <div class="text-lg font-bold py-4">رسیدن به 10,000 مشتری</div>
+                          <p class="max-w-lg leading-loose">با تکیه بر اعتماد شما، به نقطه عطف مهمی در تاریخ خود رسیدیم و دهمین هزارمین مشتری خود را جشن گرفتیم.</p>
+                        </div>
+                        <hr/>
+                      </li>
+                      <li>
+                        <hr/>
+                        <div class="timeline-middle text-2xl"><i class="ti ti-sparkles text-lg text-warning" aria-hidden="true"></i></div>
+                        <div class="timeline-end py-2">
+                          <time class="font-medium">۱۴۰۴</time>
+                          <div class="text-lg font-bold py-4">توسعه به بازارهای جدید</div>
+                          <p class="max-w-lg leading-loose">با گسترش تیم و زیرساخت، محصولات جدیدی را معرفی کردیم و دامنه خدمات خود را به سراسر کشور گسترش دادیم.</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </section>
+                <!-- values-->
+                <section class="py-20 bg-base-100" id="our-values" aria-labelledby="values-heading">
+                  <div class="container mx-auto space-y-8 px-4">
+                    <div class="text-center space-y-4">
+                      <h2 class="text-4xl font-bold" id="values-heading">ارزش‌های بنیادین ما</h2>
+                      <p class="text-base-content/75">اصولی که ما را در هر قدم هدایت می‌کنند.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                      <div class="p-8 space-y-6 rounded-lg">
+                        <div class="text-5xl"><i class="ti ti-rosette-filled text-9xl text-warning" aria-hidden="true"></i></div>
+                        <h3 class="text-2xl font-bold">کیفیت بی‌نظیر</h3>
+                        <p>ما تنها محصولاتی را ارائه می‌دهیم که خودمان به آن‌ها ایمان داریم. کیفیت خط قرمز ماست.</p>
+                      </div>
+                      <div class="p-8 space-y-6 rounded-lg">
+                        <div class="text-5xl"><i class="ti ti-heart-handshake text-9xl text-warning" aria-hidden="true"></i></div>
+                        <h3 class="text-2xl font-bold">مشتری‌مداری</h3>
+                        <p>شما در مرکز تمام فعالیت‌های ما قرار دارید. رضایت شما بزرگترین دستاورد ماست.</p>
+                      </div>
+                      <div class="p-8 space-y-6 rounded-lg">
+                        <div class="text-5xl"><i class="ti ti-bulb-filled text-9xl text-warning" aria-hidden="true"></i></div>
+                        <h3 class="text-2xl font-bold">نوآوری و بهبود مستمر</h3>
+                        <p>ما همیشه در جستجوی راه‌هایی برای بهتر شدن هستیم، از محصولات گرفته تا فرآیندهایمان.</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <!-- team-->
+                <section class="py-20 bg-gradient-to-b from-base-200 to-base-100 rounded-xl" aria-labelledby="team-heading">
+                  <div class="container mx-auto space-y-8 px-4">
+                    <div class="text-center space-y-4">
+                      <h2 class="text-4xl font-bold" id="team-heading">تیم ما، خانواده ما</h2>
+                      <p class="text-base-content/75">با افرادی آشنا شوید که این رویا را به واقعیت تبدیل کرده‌اند.</p>
+                    </div>
+                    <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                      <div class="card bg-base-100 shadow-2xl shadow-base-300 transition-transform duration-300 hover:-translate-y-2">
+                        <figure class="px-10 pt-10"><img class="rounded-full w-32 h-32 object-cover ring ring-primary ring-offset-base-100 ring-offset-2" src="https://i.pravatar.cc/300?u=6" alt="تصویر پروفایل"/></figure>
+                        <div class="card-body items-center text-center">
+                          <h3 class="card-title">سارا محمدی</h3>
+                          <p class="text-base-content/75">مدیرعامل و بنیان‌گذار</p>
+                          <div class="card-actions"><a class="btn btn-ghost btn-square btn-sm" href="#" aria-label="پروفایل لینکدین"><i class="ti ti-brand-linkedin text-lg" aria-hidden="true"></i></a></div>
+                        </div>
+                      </div>
+                      <div class="card bg-base-100 shadow-2xl shadow-base-300 transition-transform duration-300 hover:-translate-y-2">
+                        <figure class="px-10 pt-10"><img class="rounded-full w-32 h-32 object-cover ring ring-primary ring-offset-base-100 ring-offset-2" src="https://i.pravatar.cc/300?u=2" alt="تصویر پروفایل"/></figure>
+                        <div class="card-body items-center text-center">
+                          <h3 class="card-title">علی رضایی</h3>
+                          <p class="text-base-content/75">مدیر فنی</p>
+                          <div class="card-actions"><a class="btn btn-ghost btn-square btn-sm" href="#" aria-label="پروفایل لینکدین"><i class="ti ti-brand-linkedin text-lg" aria-hidden="true"></i></a></div>
+                        </div>
+                      </div>
+                      <div class="card bg-base-100 shadow-2xl shadow-base-300 transition-transform duration-300 hover:-translate-y-2">
+                        <figure class="px-10 pt-10"><img class="rounded-full w-32 h-32 object-cover ring ring-primary ring-offset-base-100 ring-offset-2" src="https://i.pravatar.cc/300?u=7" alt="تصویر پروفایل"/></figure>
+                        <div class="card-body items-center text-center">
+                          <h3 class="card-title">مریم حسینی</h3>
+                          <p class="text-base-content/75">مدیر بازاریابی</p>
+                          <div class="card-actions"><a class="btn btn-ghost btn-square btn-sm" href="#" aria-label="پروفایل لینکدین"><i class="ti ti-brand-linkedin text-lg" aria-hidden="true"></i></a></div>
+                        </div>
+                      </div>
+                      <div class="card bg-base-100 shadow-2xl shadow-base-300 transition-transform duration-300 hover:-translate-y-2">
+                        <figure class="px-10 pt-10"><img class="rounded-full w-32 h-32 object-cover ring ring-primary ring-offset-base-100 ring-offset-2" src="https://i.pravatar.cc/300?u=9" alt="تصویر پروفایل"/></figure>
+                        <div class="card-body items-center text-center">
+                          <h3 class="card-title">رضا کریمی</h3>
+                          <p class="text-base-content/75">مدیر عملیات</p>
+                          <div class="card-actions"><a class="btn btn-ghost btn-square btn-sm" href="#" aria-label="پروفایل لینکدین"><i class="ti ti-brand-linkedin text-lg" aria-hidden="true"></i></a></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <!-- contact-->
+                <section class="py-20 bg-base-100" id="contact" aria-labelledby="contact-heading">
+                  <div class="container mx-auto space-y-8 px-4">
+                    <div class="text-center space-y-8">
+                      <h2 class="text-4xl font-bold" id="contact-heading">
+                         به ما بپیوندید</h2>
+                      <p class="text-base-content/75 font-medium">
+                         ما همیشه به دنبال استعدادهای جدید هستیم و از شنیدن صدای شما خوشحال می‌شویم.</p>
+                    </div>
+                    <div class="max-w-2xl mx-auto space-y-8 text-center">
+                      <p class="text-lg/loose">چه به دنبال فرصت‌های شغلی باشید و چه سوالی در مورد محصولات ما داشته باشید، تیم ما آماده پاسخگویی است. از طریق راه‌های زیر با ما در ارتباط باشید.</p>
+                      <div class="flex gap-6 justify-center"><a class="btn btn-primary shadow-lg shadow-primary/25" href="mailto:">
+                           ارسال ایمیل<i class="ti ti-mail text-lg" aria-hidden="true"></i></a><a class="btn btn-secondary btn-outline shadow-lg shadow-secondary/25" href="">
+                           فرصت‌های شغلی<i class="ti ti-chevron-left text-lg" aria-hidden="true"></i></a></div>
+                    </div>
+                  </div>
+                </section>
+              </section>
+              <!-- footer-->
+              <footer class="container mx-auto bg-neutral text-neutral-content py-12 px-6 lg:px-12 rounded-xl my-20 shadow-xl">
+                <div class="grid gap-10 grid-cols-1 md:grid-cols-4">
+                  <!-- logo & about-->
+                  <div class="space-y-4"><a class="inline-block max-w-[100px]" href=""><img src="{% static 'img/logo-white.png' %}" alt="لوگو"/></a>
+                    <p class="text-sm text-neutral-content/75 leading-6">
+                      فروشگاه آنلاین ما با هدف ارائه بهترین تجربه خرید اینترنتی،
+                      همراه با پشتیبانی 24 ساعته و ارسال سریع راه‌اندازی شده است.
+                    </p>
+                  </div>
+                  <!-- links-->
+                  <div class="space-y-4">
+                    <h4 class="font-bold text-primary">دسترسی سریع</h4>
+                    <ul class="space-y-4">
+                      <li><a class="flex gap-2 items-center hover:text-primary transition-colors" href=""><i class="ti ti-arrow-up-right"></i>سوالات متداول</a></li>
+                      <li><a class="flex gap-2 items-center hover:text-primary transition-colors" href=""><i class="ti ti-arrow-up-right"></i>شرایط و قوانین</a></li>
+                      <li><a class="flex gap-2 items-center hover:text-primary transition-colors" href=""><i class="ti ti-arrow-up-right"></i>حریم خصوصی</a></li>
+                      <li><a class="flex gap-2 items-center hover:text-primary transition-colors" href=""><i class="ti ti-arrow-up-right"></i>راهنمای خرید</a></li>
+                    </ul>
+                  </div>
+                  <!-- links-->
+                  <div class="space-y-4">
+                    <h4 class="font-bold text-primary">خدمات مشتریان</h4>
+                    <ul class="space-y-4">
+                      <li><a class="flex gap-2 items-center hover:text-primary transition-colors" href=""><i class="ti ti-arrow-up-right"></i>بازگشت کالا</a></li>
+                      <li><a class="flex gap-2 items-center hover:text-primary transition-colors" href=""><i class="ti ti-arrow-up-right"></i>پشتیبانی</a></li>
+                      <li><a class="flex gap-2 items-center hover:text-primary transition-colors" href=""><i class="ti ti-arrow-up-right"></i>نقشه سایت</a></li>
+                    </ul>
+                  </div>
+                  <!-- contact-->
+                  <div class="space-y-4">
+                    <h4 class="font-bold text-primary">ارتباط با ما</h4>
+                    <p class="text-sm">تهران، خیابان مثال، پلاک ۱۲۳</p>
+                    <p class="text-sm">📞 ۰۲۱-۱۲۳۴۵۶۷</p>
+                    <p class="text-sm">✉️ info@example.com</p>
+                    <div class="flex gap-4 py-4"><a class="hover:text-primary transition-colors" href=""><i class="ti ti-brand-instagram text-2xl"></i></a><a class="hover:text-primary transition-colors" href=""><i class="ti ti-brand-telegram text-2xl"></i></a><a class="hover:text-primary transition-colors" href=""><i class="ti ti-brand-whatsapp text-2xl"></i></a></div>
+                  </div>
+                </div>
+              </footer>
+{% endblock %}
