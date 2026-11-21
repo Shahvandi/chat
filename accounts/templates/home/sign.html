@@ -109,14 +109,14 @@
             </div>
           </div>
           <label class="tab">
-            <input type="radio" name="signTabs" {% if request.GET.sign_in %} checked="checked" {% endif %}>   {# todo #}
+            <input type="radio" name="signTabs" {% if request.GET.sign_in %} checked="checked" {% endif %}>
             <div class="flex gap-2 items-center px-4"><i class="ti ti-phone-check text-lg" aria-hidden="true"></i>
               <div class="font-medium"> ورود‌ با تلفن </div>
             </div>
           </label>
           <div class="tab-content bg-base-100 border-base-300 rounded-xl p-6 md:p-8 lg:p-10">
             <!-- -------------------------------------------------------------------------->
-            <form class="space-y-6" action="{% url 'accounts:send_otp' %}" method="POST">      {# todo #}
+            <form class="space-y-6" action="{% url 'accounts:send_otp' %}" method="POST">
               {% csrf_token %}
               <!-- title-->
               <h2 class="text-lg font-medium">ورود با کد یک بار مصرف</h2>

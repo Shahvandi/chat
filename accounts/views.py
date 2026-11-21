@@ -49,7 +49,7 @@ class SendOtp(View):
         code = randint(100000, 999999)
         token = get_random_string(length=64)
         Otp.objects.create(token=token, phone=phone, code=code)
-        print(phone, code, token[:20])          # todo: send sms
+        print(phone, code, token[:20])          # todo: sms or email
         messages.success(self.request, f'Code sent to {phone}')
         return redirect(f'{reverse("accounts:check_otp")}?token={token}')
 
