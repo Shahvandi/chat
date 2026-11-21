@@ -15,7 +15,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ["mobile", "is_admin"]
     list_filter = ["is_admin"]
     fieldsets = [
-        (None, {"fields": ["mobile", "fullname", "email", "password"]}),
+        (None, {"fields": ["mobile", "first_name", "last_name", "email", "password"]}),
         ("دسترسی ها", {"fields": ["is_active", "is_admin"]}),
     ]
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -25,7 +25,7 @@ class UserAdmin(BaseUserAdmin):
             None,
             {
                 "classes": ["wide"],
-                "fields": ["mobile", "fullname", "email", "password1", "password2"],
+                "fields": ["mobile", "first_name", "last_name", "email", "password1", "password2"],
             },
         ),
     ]

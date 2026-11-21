@@ -6,10 +6,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title> نت‌زون | صفحه ورود کد </title>
-    <link rel="stylesheet" href="{% static 'vendor/lib/swiper/swiper-bundle.min.css' %}">
-    <link rel="stylesheet" href="{% static 'vendor/fonts/tabler/tabler-icons.css' %}">
-    <link rel="stylesheet" href="{% static 'vendor/lib/nouislider/nouislider.min.css' %}">
+    <title>صفحه ورود کد</title>
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
   </head>
   <body>
@@ -21,53 +18,38 @@
       {% include 'home/messages.html' %}
       <!-- --------------------------------- main ----------------------------------->
       <main class="flex-1 flex gap-8 flex-col items-center py-12 px-4 md:px-6 lg:px-8" role="main">
-        <!-- logo--><a class="link" href=""> <img src="{% static 'img/logo-black.png' %}" alt="لوگو"></a>
+        <!-- logo-->
+        <a class="link" href=""> <img src="{% static 'img/logo-black.png' %}" alt="Logo"></a>
         <!-- --------------------------------- main ----------------------------------->
         <div class="tabs tabs-border w-full max-w-md">
           <label class="tab">
             <input type="radio" name="signTabs" checked="checked">
-            <div class="flex gap-2 items-center px-4"><i class="ti ti-phone-check text-lg" aria-hidden="true"></i>
-              <div class="font-medium"> ورود‌ با تلفن </div>
+            <div class="flex gap-2 items-center px-4"><i class="ti ti-login-2 text-lg" aria-hidden="true"></i>
+              <div class="font-medium">ورود با تلفن همراه</div>
             </div>
           </label>
-          <div class="tab-content bg-base-100 border-base-300 rounded-xl p-6 md:p-8 lg:p-10">
+          <div class="tab-content w-full min-h-[420px] bg-base-100 border-base-300 rounded-xl p-6 md:p-8 lg:p-10">
             <!-- -------------------------------------------------------------------------->
             <form class="space-y-6" action="" method="POST">
               {% csrf_token %}
-              <!-- title-->
-              <h2 class="text-lg font-medium">ورود با کد یک بار مصرف</h2>
+{#              <!-- title-->#}
+{#              <h2 class="text-lg font-medium">ورود با کد یک بار مصرف</h2>#}
               <fieldset class="fieldset space-y-4 font-medium">
-                <!-- phone input-->
+                <!-- code input-->
                 <div class="space-y-2">
                   <label class="label text-sm" for="code">کد 6 رقمی دریافتی را وارد کنید:</label>
-                  <input class="input w-full" name="code" type="text" placeholder="" autocomplete="code" dir="ltr" required>
+                  <input class="input w-full" name="code" value="{{ request.GET.username }}" type="text" placeholder="" autocomplete="code" dir="ltr" required>
                 </div>
               </fieldset>
               <!-- submit-->
               <button class="w-full btn rounded-full btn-primary group" type="submit">
                  ورود<i class="ti ti-chevron-left text-lg opacity-75 group-hover:-translate-x-1 group-focus:-translate-x-1
                         transition-transform duration-300 ease-in-out" aria-hidden="true"></i></button>
-              <!-- term-->
-              <p class="text-xs/relaxed text-center font-medium">با ادامه، شما با<a class="mx-1 link link-hover link-info" href="">
-                   شرایط استفاده</a> و<a class="mx-1 link link-hover link-info" href="">
-                   قوانین حریم خصوصی</a>‌نت‌زون
-                موافقت می‌کنید.
-              </p>
             </form>
           </div>
         </div>
-        <!-- ------------------------------- end main --------------------------------->
-        <!---->
-        <div class="w-full max-w-md flex gap-4 flex-col text-sm py-8 rounded-xl bg-gradient-to-b from-base-200/50 via-base-100 to-base-100">
-          <nav class="flex gap-4 justify-center items-center"><a class="link link-hover link-info" href="">
-               راهنمایی</a><a class="link link-hover link-info" href="">
-               شرایط استفاده</a><a class="link link-hover link-info" href="">
-               حریم خصوصی</a></nav>
-          <p class="text-xs font-medium text-center text-base-content/75">© 2025 (۱۴۰۴) شرکت ‌نت‌زون و شرکت‌های وابسته آن</p>
-        </div>
       </main>
       <!-- ------------------------------- end main --------------------------------->
-      <!-- -------------------------------------------------------------------------->
     </div>
     <!-- -------------------------------------------------------------------------->
     <!--                                end Website                              -->
