@@ -171,7 +171,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'accounts.User'
 
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/accounts/sign/'
 
 LOGIN_REDIRECT_URL = '/'
 

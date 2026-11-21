@@ -1,23 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+import uuid
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, phone=None, email=None, fullname=None, password=None):
+    def create_user(self, mobile=None, email=None, fullname=None, password=None):
 
         user = self.model()
-        user.phone = phone
+        user.mobile = mobile
         user.email = email
         user.fullname = fullname
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, phone, email, fullname, password=None):
+    def create_superuser(self, mobile, email, fullname, password=None):
         """
         Creates and saves a superuser with the given email and password.
         """
-        user = self.create_user(phone, email, fullname, password=password)
+        user = self.create_user(mobile, email, fullname, password=password)
         user.is_superuser = True
         user.is_admin = True
         user.save(using=self._db)
@@ -25,7 +26,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    phone = models.CharField(max_length=11, null=True, blank=True, unique=True, verbose_name='تلفن همراه')
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    mobile = models.CharField(max_length=11, unique=True, verbose_name='تلفن همراه')
     email = models.EmailField(
         verbose_name='آدرس ایمیل',
         max_length=255,
@@ -68,13 +70,13 @@ class User(AbstractBaseUser):
 
 # SMS verification Model:
 class Otp(models.Model):
-    phone = models.CharField(max_length=11)
+    mobile = models.CharField(max_length=11)
     token = models.CharField(max_length=100,unique=True, null=True)
     code = models.SmallIntegerField()
     expiration_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.phone
+        return self.mobile
 
     class Meta:
         verbose_name = 'کد'
